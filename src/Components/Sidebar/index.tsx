@@ -1,5 +1,5 @@
-import { SidebarFeedback, SidebarItem, SidebarMobileToggle, SidebarWrapper } from './Styles';
-import { VscPreview, VscMail, VscProject, VscListTree, VscMap, VscRepo, VscPulse, VscMenu } from 'react-icons/vsc';
+import { SidebarItem, SidebarMobileToggle, SidebarWrapper } from './Styles';
+import { VscPreview, VscMap, VscRepo, VscMenu } from 'react-icons/vsc';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useMediaQuery, useOnClickOutside } from 'usehooks-ts';
