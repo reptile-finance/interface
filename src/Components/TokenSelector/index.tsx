@@ -18,7 +18,7 @@ export type TokenSelectorProps = {
 };
 
 export const TokenSelector = ({ open, setOpen, setToken }: TokenSelectorProps) => {
-    const { getTokens } = useConfig();
+    const { getTokens, config } = useConfig();
     const [supportedTokens, setSupportedTokens] = useState<EthAddress[]>([]);
     const [search, setSearch] = useState<string>('');
     const tokens = useRecoilValue(TokensState);
@@ -57,9 +57,9 @@ export const TokenSelector = ({ open, setOpen, setToken }: TokenSelectorProps) =
 
     const filteredTokens = useMemo(() => {
         if (!search) return supportedTokens;
-        const fuse = new Fuse(Object.values(tokens), { keys: ['name', 'symbol', 'address'] });
+        const fuse = new Fuse(Object.values(tokens[config.chainId]), { keys: ['name', 'symbol', 'address'] });
         return fuse.search(search).map((result) => result.item.address);
-    }, [search, supportedTokens, tokens]);
+    }, [config.chainId, search, supportedTokens, tokens]);
 
     useEffect(() => {
         if (!open) setSearch('');
