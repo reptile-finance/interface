@@ -10,7 +10,7 @@ import { Overview } from './Views/Overview';
 import { ThemeProvider } from 'styled-components';
 import { base } from './Theme';
 import { Toaster } from 'react-hot-toast';
-import { BalanceUpdater } from './Components/BalanceUpdater';
+import { Updater } from './Components/Updater';
 import { ErrorBoundary } from './Components/ErrorBoundary';
 import { Notifications } from './Components/Notifications';
 import { Shell } from './Views/Shell';
@@ -42,7 +42,7 @@ function App() {
                         <ThemeProvider theme={base}>
                             <RouterProvider router={router} />
                         </ThemeProvider>
-                        <BalanceUpdater />
+                        <Updater />
                         <Notifications />
                     </RecoilRoot>
                 </RainbowKitProvider>

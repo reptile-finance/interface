@@ -1,13 +1,18 @@
 import { atom } from 'recoil';
 import { EthAddress } from '../Types';
 import { localStorageEffect } from './Utils';
+import { opBnbChain } from '../Providers/Blockchain';
 
 export type TBalanceState = {
-    [key: EthAddress]: string;
+    [chainId: string]: {
+        [key: EthAddress]: string;
+    };
 };
 
 export const BalanceState = atom<TBalanceState>({
     key: 'balance-state',
-    default: {},
+    default: {
+        [opBnbChain.id]: {},
+    },
     effects: [localStorageEffect<TBalanceState>('balances-state')],
 });

@@ -1,26 +1,32 @@
 import { useCallback } from 'react';
 import { AppConfig, EthAddress } from '../Types';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { TokensState } from '../State/Tokens';
-
-let config: AppConfig | null = null;
+import { ConfigState } from '../State/Config';
 
 export const useConfig = () => {
     const savedTokens = useRecoilValue(TokensState);
+    const [config, setConfig] = useRecoilState(ConfigState);
+
+    const updateAppConfig = useCallback(async () => {
+        const appConfig = (await fetch('/Config.json').then((res) => res.json())) as AppConfig;
+        setConfig((prev) => ({
+            ...prev,
+            appConfig,
+        }));
+    }, [setConfig]);
 
     const getTokens = useCallback(async () => {
-        if (!config) {
-            config = (await fetch('/Config.json').then((res) => res.json())) as AppConfig;
-        }
+        const cfg = config.appConfig[config.chainId]?.tokens;
         const tokenSet = new Set<EthAddress>();
-        config.tokens.forEach((token) => {
+        cfg.forEach((token) => {
             tokenSet.add(token.toLowerCase() as EthAddress);
         });
-        Object.keys(savedTokens).forEach((token) => {
+        Object.keys(savedTokens[config.chainId]).forEach((token) => {
             tokenSet.add(token.toLowerCase() as EthAddress);
         });
         return [...tokenSet];
-    }, [savedTokens]);
+    }, [config.appConfig, config.chainId, savedTokens]);
 
-    return { getTokens };
+    return { config, getTokens, updateAppConfig };
 };
