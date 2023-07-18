@@ -14,6 +14,7 @@ import { Updater } from './Components/Updater';
 import { ErrorBoundary } from './Components/ErrorBoundary';
 import { Notifications } from './Components/Notifications';
 import { Shell } from './Views/Shell';
+import { Earn } from './Views/Earn';
 
 const router = createBrowserRouter([
     {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
         children: [
             { path: '/', element: <Overview />, index: true },
             { path: '/overview', element: <Overview /> },
+            { path: '/earn', element: <Earn />}
         ],
     },
 ]);

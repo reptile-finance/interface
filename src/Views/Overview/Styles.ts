@@ -86,3 +86,4 @@ export const SwapWrapper = styled.div`
 export const LiquidityWrapper = styled.div`
     width: 50rem;
 `;
+
