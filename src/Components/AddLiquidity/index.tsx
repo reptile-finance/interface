@@ -109,13 +109,13 @@ export const AddLiquidity = () => {
         }
         return promises;
     }, [
-        activeChainConfig.id,
+        activeChainConfig,
         approve,
         isEnoughAllowance0,
         isEnoughAllowance1,
         token0,
         token1,
-        uniswapConfig.router,
+        uniswapConfig,
         value0,
         value1,
     ]);
@@ -142,7 +142,7 @@ export const AddLiquidity = () => {
         } finally {
             setLoading((st) => (st -= 1));
         }
-    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0.address, token1.address, value0, value1]);
+    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0, token1, value0, value1]);
 
     const buttonText = useMemo(() => {
         if (loading > 0) return 'Loading...';
