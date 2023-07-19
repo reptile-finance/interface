@@ -47,6 +47,7 @@ export const Overview = () => {
                         <Liquidity />
                     </LiquidityWrapper>
                 );
+
             default:
                 return () => <Swap />;
         }

@@ -1,5 +1,5 @@
 import { SidebarItem, SidebarMobileToggle, SidebarWrapper } from './Styles';
-import { VscPreview, VscMap, VscRepo, VscMenu } from 'react-icons/vsc';
+import { VscPreview, VscMap, VscRepo, VscMenu, VscRocket } from 'react-icons/vsc';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useMediaQuery, useOnClickOutside } from 'usehooks-ts';
@@ -49,6 +49,13 @@ export const Sidebar = () => {
                 >
                     <VscPreview />
                     <span>Overview</span>
+                </SidebarItem>
+                <SidebarItem
+                    onClick={() => navigate('/earn')}
+                    className={/earn/i.test(sectionTitle) ? 'active' : undefined}
+                >
+                    <VscRocket />
+                    <span>Earn</span>
                 </SidebarItem>
                 <SidebarItem onClick={() => window.open('https://opbnbscan.com/', '_blank')}>
                     <VscMap />
