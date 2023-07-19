@@ -4,15 +4,15 @@ import { Sidebar } from '../../Components/Sidebar';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useMemo } from 'react';
 import { useBalances } from '../../Hooks/useBalances';
-import { useNetwork } from 'wagmi';
 import { formatBalance } from '../../Utils/Bignumber';
 import { zeroAddress } from 'viem';
+import { useConfig } from '../../Hooks/useConfig';
 
 export const Shell = () => {
     const location = useLocation();
     const { getBalance } = useBalances();
     const navigate = useNavigate();
-    const { chain } = useNetwork();
+    const { activeChainConfig } = useConfig();
 
     const sectionTitle = useMemo(() => {
         const title = location.pathname.replace('/', '').replace('-', ' ');
@@ -20,8 +20,8 @@ export const Shell = () => {
     }, [location.pathname]);
 
     const balance = useMemo(() => {
-        return formatBalance(getBalance(zeroAddress), 4, chain?.nativeCurrency.decimals);
-    }, [chain, getBalance]);
+        return formatBalance(getBalance(zeroAddress), 4, activeChainConfig?.nativeCurrency.decimals);
+    }, [activeChainConfig, getBalance]);
 
     return (
         <ShellWrapper>
@@ -32,7 +32,7 @@ export const Shell = () => {
                     <img src={''} alt="mini-logo" onClick={() => navigate('/')} />
                     <AccountWrapper>
                         <AccountBalance>
-                            {balance} {chain?.nativeCurrency.symbol}
+                            {balance} {activeChainConfig?.nativeCurrency.symbol}
                         </AccountBalance>
                         <ConnectButton showBalance={false} />
                     </AccountWrapper>

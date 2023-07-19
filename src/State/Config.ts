@@ -13,7 +13,7 @@ export const ConfigState = atom<TConfigState>({
     default: {
         chainId: opBnbChain.id.toString(),
         appConfig: {
-            [opBnbChain.id]: {
+            [opBnbChain.id.toString()]: {
                 tokens: [],
             },
         },

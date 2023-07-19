@@ -12,7 +12,7 @@ export type TBalanceState = {
 export const BalanceState = atom<TBalanceState>({
     key: 'balance-state',
     default: {
-        [opBnbChain.id]: {},
+        [opBnbChain.id.toString()]: {},
     },
     effects: [localStorageEffect<TBalanceState>('balances-state')],
 });

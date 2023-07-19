@@ -1,28 +1,29 @@
 #root {
-  margin: 0 auto;
+    margin: 0 auto;
 }
 
 .modal-overlay {
-  backdrop-filter: blur(2px);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 999;
+    backdrop-filter: blur(2px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999;
 }
 
 .toaster-notification {
-  backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: #fff !important;
+    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.15) !important;
+    font-size: 0.9rem;
+    color: #fff !important;
 }
 
 a {
-  text-decoration: none;
-  color: #1cb0ff;
+    text-decoration: none;
+    color: #1cb0ff;
 }
 
 a:hover {
-  text-decoration: underline;
+    text-decoration: underline;
 }

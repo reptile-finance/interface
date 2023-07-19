@@ -16,15 +16,16 @@ import { zeroAddress } from 'viem';
 import { Swap } from '../../Components/Swap';
 import { AddLiquidity } from '../../Components/AddLiquidity';
 import { Liquidity } from '../../Components/Liquidity';
+import { useConfig } from '../../Hooks/useConfig';
 
 export const Overview = () => {
     const { getBalance } = useBalances();
-    const { chain } = useNetwork();
+    const { activeChainConfig } = useConfig();
     const [activeTab, setActiveTab] = useState(0);
 
     const userBalance = useMemo(() => {
-        return formatBalance(getBalance(zeroAddress), 4, chain?.nativeCurrency.decimals);
-    }, [chain, getBalance]);
+        return formatBalance(getBalance(zeroAddress), 4, activeChainConfig.nativeCurrency.decimals);
+    }, [activeChainConfig.nativeCurrency.decimals, getBalance]);
 
     const Tab = useMemo(() => {
         switch (activeTab) {
@@ -56,7 +57,7 @@ export const Overview = () => {
             <OverviewBalance>
                 <WelcomeMsg>Welcome, you have</WelcomeMsg>
                 <WelcomeBalance>
-                    {userBalance} <span>{chain?.nativeCurrency.symbol}</span>
+                    {userBalance} <span>{activeChainConfig?.nativeCurrency.symbol}</span>
                 </WelcomeBalance>
             </OverviewBalance>
             <Tabs>

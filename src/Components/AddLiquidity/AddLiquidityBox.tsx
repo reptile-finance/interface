@@ -5,13 +5,18 @@ import {
     AddLiquidityInputTokenBalances,
 } from './Styles';
 import { useBalances } from '../../Hooks/useBalances';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatBalance } from '../../Utils/Bignumber';
 import { TokenSelector } from '../TokenSelector';
-import { EthAddress } from '../../Types';
+import { EthAddress, TokenMetadata } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
 
-export const AddLiquidityBox: React.FC<{ defaultToken?: EthAddress }> = ({ defaultToken }) => {
+export const AddLiquidityBox: React.FC<{
+    defaultToken?: EthAddress;
+    onTokenChange?: (token: TokenMetadata) => void;
+    onChange?: (v: string) => void;
+    value: string;
+}> = ({ defaultToken, value, onChange, onTokenChange }) => {
     const { getBalance } = useBalances();
     const [selectorOpen, setSelectorOpen] = useState(false);
     const [token, setToken] = useState<EthAddress | undefined>(defaultToken ?? undefined);
@@ -43,6 +48,12 @@ export const AddLiquidityBox: React.FC<{ defaultToken?: EthAddress }> = ({ defau
         );
     }, [balance, data, isError, isLoading]);
 
+    useEffect(() => {
+        if (token) {
+            onTokenChange && onTokenChange(data);
+        }
+    }, [data, onTokenChange, token]);
+
     return (
         <>
             <AddLiquidityInputBox>
@@ -50,7 +61,12 @@ export const AddLiquidityBox: React.FC<{ defaultToken?: EthAddress }> = ({ defau
                     <BalanceInfo />
                 </AddLiquidityInputTokenBalances>
                 <AddLiquidityInputNumber>
-                    <input type="decimals" placeholder="0.0" />
+                    <input
+                        type="decimals"
+                        placeholder="0.0"
+                        value={value}
+                        onChange={(evt) => onChange(evt.currentTarget.value)}
+                    />
                 </AddLiquidityInputNumber>
             </AddLiquidityInputBox>
             <TokenSelector

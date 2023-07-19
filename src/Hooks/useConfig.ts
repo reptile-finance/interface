@@ -1,12 +1,23 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { AppConfig, EthAddress } from '../Types';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { TokensState } from '../State/Tokens';
 import { ConfigState } from '../State/Config';
+import { useNetwork } from 'wagmi';
+import { opBnbChain } from '../Providers/Blockchain';
+
+const DEFAULT_CONFIG = opBnbChain;
 
 export const useConfig = () => {
     const savedTokens = useRecoilValue(TokensState);
     const [config, setConfig] = useRecoilState(ConfigState);
+    const { chains } = useNetwork();
+
+    const activeChainConfig = useMemo(() => {
+        const findChain = chains.find((c) => c.id.toString() === config.chainId);
+        if (!findChain) return DEFAULT_CONFIG;
+        return findChain;
+    }, [chains, config.chainId]);
 
     const updateAppConfig = useCallback(async () => {
         const appConfig = (await fetch('/Config.json').then((res) => res.json())) as AppConfig;
@@ -28,5 +39,5 @@ export const useConfig = () => {
         return [...tokenSet];
     }, [config.appConfig, config.chainId, savedTokens]);
 
-    return { config, getTokens, updateAppConfig };
+    return { config, activeChainConfig, getTokens, updateAppConfig };
 };
