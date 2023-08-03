@@ -8,7 +8,6 @@ import {
 } from './Styles';
 import { AddLiquidityBox } from './AddLiquidityBox';
 import { TokenMetadata } from '../../Types';
-import { useUniswap } from '../../Hooks/useUniswap';
 import { eventBus } from '../../Bus';
 import { Notification } from '../Notifications';
 import { erc20ABI, useContractReads, useWalletClient } from 'wagmi';
@@ -17,6 +16,7 @@ import { Config } from '../../Config';
 import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
 import { waitForTransaction } from 'wagmi/actions';
+import { useLiquidity } from '../../Hooks/useLiquidity';
 
 const ERC20Config = {
     abi: erc20ABI,
@@ -30,7 +30,7 @@ const STATES: { [state: string]: string } = {
 };
 
 export const AddLiquidity = () => {
-    const { addLiquidity } = useUniswap();
+    const { addLiquidity } = useLiquidity();
     const [value0, setValue0] = useState('');
     const [value1, setValue1] = useState('');
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
