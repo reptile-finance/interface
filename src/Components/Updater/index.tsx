@@ -7,12 +7,16 @@ import { EthAddress } from '../../Types';
 import { useConfig } from '../../Hooks/useConfig';
 import { useNetwork } from 'wagmi';
 import { ConfigState } from '../../State/Config';
+import { PoolsState } from '../../State/Pools';
+import { usePools } from '../../Hooks/usePools';
 
 export const Updater = () => {
     const { updateAppConfig, config } = useConfig();
     const [, setBalances] = useRecoilState(BalanceState);
+    const [, setPools] = useRecoilState(PoolsState);
     const { getBalances } = useBalances();
     const { chain } = useNetwork();
+    const { getPools } = usePools();
     const [, setConfig] = useRecoilState(ConfigState);
 
     const updateBalances = useCallback(async () => {
@@ -30,13 +34,38 @@ export const Updater = () => {
         });
     }, [getBalances, setBalances]);
 
+    const updatePools = useCallback(async () => {
+        getPools().then((pools) => {
+            const chainId = config.chainId;
+            const poolsObj = pools.reduce<{ [poolAddr: EthAddress]: { token0: EthAddress; token1: EthAddress } }>(
+                (acc, pool) => {
+                    acc[pool[2]] = {
+                        token0: pool[0],
+                        token1: pool[1],
+                    };
+                    return acc;
+                },
+                {},
+            );
+            setPools((st) => ({
+                ...st,
+                [chainId]: poolsObj,
+            }));
+        });
+    }, [config, getPools, setPools]);
+
     useInterval(() => {
         updateBalances();
     }, 5000);
 
+    useInterval(() => {
+        // updatePools();
+    }, 10_000);
+
     useEffect(() => {
         updateAppConfig();
         updateBalances();
+        updatePools();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -1,17 +1,16 @@
-import { Button } from '../Button';
+import { usePools } from '../../Hooks/usePools';
+import { LiquidityRow } from './LiquidityRow';
 import {
-    LiquidityPositionsRow,
     LiquidityPositionsRowHeader,
     LiquidityPositionsTable,
     LiquidityTitle,
     LiquidityWrapper,
     LiquidtyContent,
-    PositionActionsWrapper,
-    PositionLogosWrapper,
-    PositionNameWrapper,
 } from './Styles';
 
 export const Liquidity = () => {
+    const { pools } = usePools();
+
     return (
         <LiquidityWrapper>
             <LiquidityTitle>
@@ -25,48 +24,9 @@ export const Liquidity = () => {
                         <span>Balance</span>
                         <span></span>
                     </LiquidityPositionsRowHeader>
-                    <LiquidityPositionsRow>
-                        <PositionNameWrapper>
-                            <PositionLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </PositionLogosWrapper>
-                            <span className="name">BNB-USDT</span>
-                        </PositionNameWrapper>
-                        <span>423.424</span>
-                        <PositionActionsWrapper>
-                            <Button>Withdraw</Button>
-                            <Button>Explore</Button>
-                        </PositionActionsWrapper>
-                    </LiquidityPositionsRow>
-                    <LiquidityPositionsRow>
-                        <PositionNameWrapper>
-                            <PositionLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </PositionLogosWrapper>
-                            <span className="name">BNB-USDT</span>
-                        </PositionNameWrapper>
-                        <span>423.424</span>
-                        <PositionActionsWrapper>
-                            <Button>Withdraw</Button>
-                            <Button>Explore</Button>
-                        </PositionActionsWrapper>
-                    </LiquidityPositionsRow>
-                    <LiquidityPositionsRow>
-                        <PositionNameWrapper>
-                            <PositionLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </PositionLogosWrapper>
-                            <span className="name">BNB-USDT</span>
-                        </PositionNameWrapper>
-                        <span>423.424</span>
-                        <PositionActionsWrapper>
-                            <Button>Withdraw</Button>
-                            <Button>Explore</Button>
-                        </PositionActionsWrapper>
-                    </LiquidityPositionsRow>
+                    {Object.keys(pools).map((pool, idx) => (
+                        <LiquidityRow key={idx} pool={{ pool, ...pools[pool] }} />
+                    ))}
                 </LiquidityPositionsTable>
             </LiquidtyContent>
         </LiquidityWrapper>
