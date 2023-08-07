@@ -17,6 +17,7 @@ import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
 import { waitForTransaction } from 'wagmi/actions';
 import { useLiquidity } from '../../Hooks/useLiquidity';
+import { usePool2 } from '../../Hooks/usePool2';
 
 const ERC20Config = {
     abi: erc20ABI,
@@ -31,14 +32,14 @@ const STATES: { [state: string]: string } = {
 
 export const AddLiquidity = () => {
     const { addLiquidity } = useLiquidity();
-    const [value0, setValue0] = useState('');
-    const [value1, setValue1] = useState('');
+    const [value, setValue] = useState<[string, string]>(['', '']);
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
     const [token1, setToken1] = useState<TokenMetadata | undefined>(undefined);
     const { activeChainConfig } = useConfig();
     const { data: wallet } = useWalletClient();
     const { approve } = useERC20();
     const [loading, setLoading] = useState(0);
+    const { data, isError } = usePool2({ token0: token0?.address, token1: token1?.address });
 
     const uniswapConfig = useMemo(() => {
         return Config[activeChainConfig.id.toString()];
@@ -72,17 +73,17 @@ export const AddLiquidity = () => {
         if (!allowances || !token0) return false;
         if (token0.address === zeroAddress) return true;
         const allowance = allowances[0];
-        const amount = parseFormattedBalance(value0, token0.decimals);
+        const amount = parseFormattedBalance(value[0], token0.decimals);
         return allowance && BN(allowance.result.toString()).gte(BN(amount));
-    }, [allowances, token0, value0]);
+    }, [allowances, token0, value]);
 
     const isEnoughAllowance1 = useMemo(() => {
         if (!allowances || !token1) return false;
         if (token1.address === zeroAddress) return true;
         const allowance = allowances.length > 1 ? allowances[1] : allowances[0];
-        const amount = parseFormattedBalance(value1, token1.decimals);
+        const amount = parseFormattedBalance(value[1], token1.decimals);
         return allowance && BN(allowance.result.toString()).gte(BN(amount));
-    }, [allowances, token1, value1]);
+    }, [allowances, token1, value]);
 
     const state = useMemo((): keyof typeof STATES => {
         if (token0 === token1 || !token0 || !token1) return 'WRONG_TOKENS';
@@ -94,14 +95,14 @@ export const AddLiquidity = () => {
         if (!token0 || !token1) return;
         const promises: Promise<void>[] = [];
         if (!isEnoughAllowance0) {
-            const amount = parseFormattedBalance(value0, token0.decimals);
+            const amount = parseFormattedBalance(value[0], token0.decimals);
             const p = approve(token0.address, uniswapConfig.router, amount).then((hash) =>
                 waitForTransaction({ hash, chainId: activeChainConfig.id }),
             );
             promises.push(p);
         }
         if (!isEnoughAllowance1) {
-            const amount = parseFormattedBalance(value1, token1.decimals);
+            const amount = parseFormattedBalance(value[1], token1.decimals);
             const p = approve(token1.address, uniswapConfig.router, amount).then((hash) =>
                 waitForTransaction({ hash, chainId: activeChainConfig.id }),
             );
@@ -109,15 +110,14 @@ export const AddLiquidity = () => {
         }
         return promises;
     }, [
-        activeChainConfig,
+        activeChainConfig.id,
         approve,
         isEnoughAllowance0,
         isEnoughAllowance1,
         token0,
         token1,
-        uniswapConfig,
-        value0,
-        value1,
+        uniswapConfig.router,
+        value,
     ]);
 
     const onSubmit = useCallback(async () => {
@@ -131,8 +131,8 @@ export const AddLiquidity = () => {
                     await addLiquidity({
                         token0: token0.address,
                         token1: token1.address,
-                        amount0Desired: value0,
-                        amount1Desired: value1,
+                        amount0Desired: value[0],
+                        amount1Desired: value[1],
                     }).then((hash) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
                     break;
             }
@@ -142,20 +142,58 @@ export const AddLiquidity = () => {
         } finally {
             setLoading((st) => (st -= 1));
         }
-    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0, token1, value0, value1]);
+    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0, token1, value]);
 
     const buttonText = useMemo(() => {
         if (loading > 0) return 'Loading...';
         return STATES[state];
     }, [loading, state]);
 
+    const setValueFn = useCallback(
+        (index: 0 | 1) => (value: string) => {
+            if (!isError) {
+                // pool exists
+                if (index === 0) {
+                    const value1 = BN(value)
+                        .multipliedBy(BN(data[1].toString() || 0))
+                        .div(BN(data[0].toString() || 0))
+                        .toFixed();
+                    return setValue([value, value1]);
+                } else {
+                    const value0 = BN(value)
+                        .multipliedBy(BN(data[0].toString() || 0))
+                        .div(BN(data[1].toString() || 0))
+                        .toFixed();
+                    return setValue([value0, value]);
+                }
+            }
+            setValue((st) => {
+                const newState: [string, string] = [...st];
+                newState[index] = value;
+                return newState;
+            });
+        },
+        [data, isError],
+    );
+
     return (
         <AddLiquidityWrapper>
+            {isError && <div>This LP doesn't exists, you will set the initial price!</div>}
             <AddLiquidityHeader>
                 <span className="swap">Add Liquidity</span>
             </AddLiquidityHeader>
-            <AddLiquidityBox defaultToken={zeroAddress} value={value0} onChange={setValue0} onTokenChange={setToken0} />
-            <AddLiquidityBox defaultToken={zeroAddress} value={value1} onChange={setValue1} onTokenChange={setToken1} />
+            <AddLiquidityBox
+                defaultToken={zeroAddress}
+                value={value[0]}
+                onChange={setValueFn(0)}
+                onTokenChange={setToken0}
+            />
+            <AddLiquidityBox
+                defaultToken={zeroAddress}
+                value={value[1]}
+                onChange={setValueFn(1)}
+                onTokenChange={setToken1}
+            />
             <AddLiquidityActionButtonWrapper>
                 <AddLiquidityActionButton loading={loading > 0} onClick={onSubmit}>
                     {buttonText}

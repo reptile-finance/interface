@@ -10,7 +10,6 @@ import {
     WelcomeBalance,
     WelcomeMsg,
 } from './Styles';
-import { useNetwork } from 'wagmi';
 import { formatBalance } from '../../Utils/Bignumber';
 import { zeroAddress } from 'viem';
 import { Swap } from '../../Components/Swap';

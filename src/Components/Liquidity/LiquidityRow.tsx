@@ -1,9 +1,10 @@
-import { useAccount, useBalance, useToken } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 import { EthAddress } from '../../Types';
 import { Button } from '../Button';
 import { LiquidityPositionsRow, PositionNameWrapper, PositionLogosWrapper, PositionActionsWrapper } from './Styles';
 import React from 'react';
 import { toPresentationLength } from '../../Utils/Bignumber';
+import { useToken } from '../../Hooks/useToken';
 
 export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAddress; pool: EthAddress } }> = ({
     pool,
@@ -14,7 +15,7 @@ export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAdd
         address: account.address,
     });
 
-    if (isError || isLoading) return null;
+    if (isError || isLoading || data.value === 0n) return null;
 
     return (
         <LiquidityPositionsRow>
@@ -25,7 +26,7 @@ export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAdd
                 </PositionLogosWrapper>
                 <span className="name">
                     <LiquidityToken address={pool.token0} />
-                    <span>-</span>
+                    <span>/</span>
                     <LiquidityToken address={pool.token1} />
                 </span>
             </PositionNameWrapper>

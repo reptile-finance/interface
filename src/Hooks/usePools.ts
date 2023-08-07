@@ -7,6 +7,7 @@ import { useUniswap } from './useUniswap';
 import { useConfig } from './useConfig';
 import { useRecoilValue } from 'recoil';
 import { PoolsState } from '../State/Pools';
+import { zeroAddress } from 'viem';
 
 export const usePools = () => {
     const { uniswapConfig } = useUniswap();
@@ -31,9 +32,27 @@ export const usePools = () => {
         }) as Promise<[EthAddress, EthAddress, EthAddress][]>; // token0, token1, pairAddress
     }, [activeChainConfig.id, uniswapConfig]);
 
+    const getPool = useCallback(
+        (token0: EthAddress, token1: EthAddress) => {
+            try {
+                return readContract({
+                    address: uniswapConfig.factory,
+                    abi: UniswapV2FactoryABI,
+                    functionName: 'getPair',
+                    args: [token0, token1],
+                    chainId: Number(activeChainConfig.id),
+                });
+            } catch (error) {
+                console.error('🚀 ~ file: usePools.ts:39 ~ getPools ~ error:', error);
+                return zeroAddress;
+            }
+        },
+        [activeChainConfig, uniswapConfig],
+    );
+
     const pools = useMemo(() => {
         return poolsState[activeChainConfig.id];
     }, [activeChainConfig, poolsState]);
 
-    return { getPools, pools };
+    return { getPools, getPool, pools };
 };

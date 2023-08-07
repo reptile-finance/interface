@@ -3,51 +3,57 @@ import { EthAddress } from '../Types';
 import { readContract } from 'wagmi/actions';
 import { useNetwork } from 'wagmi';
 import { useConfig } from './useConfig';
-import UniswapV2PairABI from '../ABI/UniswapV2Pair.json';
+import UniswapHelperABI from '../ABI/UniswapHelper.json';
+import { useUniswap } from './useUniswap';
+import { zeroAddress } from 'viem';
 
-// by pool address
-export const usePool = ({ address }: { address: EthAddress | undefined }) => {
+// by pool tokens
+export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: EthAddress }) => {
     const [isLoading, setLoading] = useState(false);
     const [isError, setError] = useState(false);
     const { chains } = useNetwork();
     const { config } = useConfig();
-    const [reserves, setReserves] = useState<[string, string]>(['0', '0']);
+    const { uniswapConfig } = useUniswap();
+    const [reserves, setReserves] = useState<[bigint, bigint]>([0n, 0n]);
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
         const chainCfg = chains.find((c) => c.id.toString() === config.id);
-        if (!address || !chainCfg) return;
+        if (!chainCfg || !token0 || !token1 || !uniswapConfig.uniswapHelper || !config) return;
         setLoading(true);
 
+        const reducedToken0 = token0 === zeroAddress ? uniswapConfig.weth : token0;
+        const reducedToken1 = token1 === zeroAddress ? uniswapConfig.weth : token1;
+
         readContract({
-            address,
-            abi: UniswapV2PairABI,
+            address: uniswapConfig.uniswapHelper,
+            abi: UniswapHelperABI,
             functionName: 'getReserves',
-            args: [],
+            args: [uniswapConfig.factory, reducedToken0, reducedToken1],
             chainId: Number(chainCfg.id),
         })
-            .then((data: [string, string, string]) => {
+            .then((data: [bigint, bigint, bigint]) => {
                 setReserves([data[0], data[1]]);
+                setError(false);
             })
             .catch((err) => {
                 setError(true);
+                setReserves([0n, 0n]);
                 throw err;
             })
             .finally(() => {
                 setLoading(false);
             });
-    }, [address, chains, config.id, isLoading]);
+    }, [chains, config, isLoading, token0, token1, uniswapConfig]);
 
     useEffect(() => {
-        if (!address) return;
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, chains]);
+    }, [token0, token1, chains]);
 
     const data = useMemo(() => {
-        if (!address) return undefined;
         return reserves;
-    }, [address, reserves]);
+    }, [reserves]);
 
     return { isLoading, isError, data };
 };

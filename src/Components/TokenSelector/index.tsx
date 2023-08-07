@@ -57,9 +57,9 @@ export const TokenSelector = ({ open, setOpen, setToken }: TokenSelectorProps) =
 
     const filteredTokens = useMemo(() => {
         if (!search) return supportedTokens;
-        const fuse = new Fuse(Object.values(tokens[config.chainId]), { keys: ['name', 'symbol', 'address'] });
+        const fuse = new Fuse(Object.values(tokens[config.id]), { keys: ['name', 'symbol', 'address'] });
         return fuse.search(search).map((result) => result.item.address);
-    }, [config.chainId, search, supportedTokens, tokens]);
+    }, [config.id, search, supportedTokens, tokens]);
 
     useEffect(() => {
         if (!open) setSearch('');

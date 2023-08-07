@@ -16,14 +16,14 @@ export const useBalances = () => {
     const getBalances = useCallback(async (): Promise<{ address: EthAddress; balance: string; chainId: string }[]> => {
         if (!address) return Promise.resolve([]);
         const supportedTokens = await getTokens();
-        const chainId = config.chainId;
+        const chainId = config.id;
         const promises = supportedTokens.map((token) => {
             return readContract({
                 address: token,
                 abi: erc20ABI,
                 functionName: 'balanceOf',
                 args: [address],
-                chainId: Number(config.chainId),
+                chainId: Number(config.id),
             })
                 .then((balance) => {
                     return {
@@ -42,7 +42,7 @@ export const useBalances = () => {
         });
         const nativeBalance = fetchBalance({
             address,
-            chainId: Number(config.chainId),
+            chainId: Number(config.id),
         })
             .then(({ value }) => ({ address: zeroAddress as EthAddress, balance: value.toString(), chainId }))
             .catch(() => ({
@@ -51,14 +51,14 @@ export const useBalances = () => {
                 chainId,
             }));
         return Promise.all([...promises, nativeBalance]);
-    }, [address, config.chainId, getTokens]);
+    }, [address, config.id, getTokens]);
 
     const getBalance = useCallback(
-        (tokenAddress: string) => {
-            const balance = balances[config.chainId][tokenAddress.toLowerCase() as EthAddress];
+        (tokenAddress: EthAddress) => {
+            const balance = balances[config.id] && balances[config.id][tokenAddress.toLowerCase() as EthAddress];
             return balance ?? '0';
         },
-        [balances, config.chainId],
+        [balances, config.id],
     );
 
     return { getBalances, balances, getBalance };

@@ -30,6 +30,7 @@ export const useConfig = () => {
     const getTokens = useCallback(async () => {
         const cfg = config.appConfig[config.chainId]?.tokens;
         const tokenSet = new Set<EthAddress>();
+        if (!cfg) return [...tokenSet];
         cfg.forEach((token) => {
             tokenSet.add(token.toLowerCase() as EthAddress);
         });
@@ -39,5 +40,9 @@ export const useConfig = () => {
         return [...tokenSet];
     }, [config.appConfig, config.chainId, savedTokens]);
 
-    return { config, activeChainConfig, getTokens, updateAppConfig };
+    const appConfig = useMemo(() => {
+        return { ...config.appConfig[config.chainId], id: config.chainId };
+    }, [config]);
+
+    return { config: appConfig, activeChainConfig, getTokens, updateAppConfig };
 };

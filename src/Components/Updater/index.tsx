@@ -36,7 +36,7 @@ export const Updater = () => {
 
     const updatePools = useCallback(async () => {
         getPools().then((pools) => {
-            const chainId = config.chainId;
+            const chainId = config.id;
             const poolsObj = pools.reduce<{ [poolAddr: EthAddress]: { token0: EthAddress; token1: EthAddress } }>(
                 (acc, pool) => {
                     acc[pool[2]] = {
@@ -70,15 +70,15 @@ export const Updater = () => {
     }, []);
 
     useEffect(() => {
-        if (chain && config.chainId !== chain.id.toString() && Object.keys(config.appConfig).length > 0) {
-            if (config.appConfig[chain.id.toString()]) {
+        if (chain && config.id !== chain.id.toString() && Object.keys(config).length > 0) {
+            if (config) {
                 setConfig((st) => ({
                     ...st,
                     chainId: chain.id.toString(),
                 }));
             }
         }
-    }, [chain, config.appConfig, config.chainId, setConfig]);
+    }, [chain, config, setConfig]);
 
     return <></>;
 };

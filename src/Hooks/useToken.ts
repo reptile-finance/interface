@@ -16,15 +16,15 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
-        const chainCfg = chains.find((c) => c.id.toString() === config.chainId);
+        const chainCfg = chains.find((c) => c.id.toString() === config.id);
         if (!address || !chainCfg) return;
         setLoading(true);
 
         if (address === zeroAddress) {
             setTokens((st) => ({
                 ...st,
-                [config.chainId]: {
-                    ...st[config.chainId],
+                [config.id]: {
+                    ...st[config.id],
                     [zeroAddress.toLowerCase() as EthAddress]: {
                         decimals: chainCfg.nativeCurrency.decimals,
                         name: chainCfg.nativeCurrency.name,
@@ -37,12 +37,12 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
             return;
         }
 
-        fetchToken({ address, chainId: Number(config.chainId) })
+        fetchToken({ address, chainId: Number(config.id) })
             .then((data) => {
                 setTokens((st) => ({
                     ...st,
-                    [config.chainId]: {
-                        ...st[config.chainId],
+                    [config.id]: {
+                        ...st[config.id],
                         [address.toLowerCase() as EthAddress]: {
                             decimals: data.decimals,
                             name: data.name,
@@ -59,19 +59,19 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [address, chains, config.chainId, isLoading, setTokens]);
+    }, [address, chains, config.id, isLoading, setTokens]);
 
     useEffect(() => {
         if (!address) return;
-        if (tokens[config.chainId][address.toLowerCase() as EthAddress]) return;
+        if (tokens[config.id] && tokens[config.id][address.toLowerCase() as EthAddress]) return;
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [address, chains]);
 
     const data = useMemo(() => {
-        if (!address) return undefined;
-        return tokens[config.chainId][address.toLowerCase() as EthAddress];
-    }, [address, tokens, config.chainId]);
+        if (!address || !tokens[config.id]) return undefined;
+        return tokens[config.id][address.toLowerCase() as EthAddress];
+    }, [address, tokens, config.id]);
 
     return { isLoading, isError, data };
 };

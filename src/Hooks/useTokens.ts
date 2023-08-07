@@ -20,15 +20,15 @@ export const useTokens = () => {
                     address: zeroAddress.toLowerCase() as EthAddress,
                 };
             }
-            const isCached = tokens[config.chainId][address.toLowerCase() as EthAddress];
+            const isCached = tokens[config.id][address.toLowerCase() as EthAddress];
             if (isCached) {
                 return isCached;
             }
-            const token = await fetchToken({ address, chainId: Number(config.chainId) });
+            const token = await fetchToken({ address, chainId: Number(config.id) });
             setTokens((st) => ({
                 ...st,
-                [config.chainId]: {
-                    ...st[config.chainId],
+                [config.id]: {
+                    ...st[config.id],
                     [address.toLowerCase() as EthAddress]: {
                         decimals: token.decimals,
                         name: token.name,
