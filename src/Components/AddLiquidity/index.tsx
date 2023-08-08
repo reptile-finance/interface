@@ -9,12 +9,13 @@ import {
 import { AddLiquidityBox } from './AddLiquidityBox';
 import { eventBus } from '../../Bus';
 import { Notification } from '../Notifications';
-import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
+import { BN, isNaN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
 import { waitForTransaction } from 'wagmi/actions';
 import { useLiquidity } from '../../Hooks/useLiquidity';
 import { usePool2 } from '../../Hooks/usePool2';
 import { useAddLiquidity } from './useAddLiquidity';
+import { LiquiditySummary } from './LiquiditySummary';
 
 const STATES: { [state: string]: string } = {
     WRONG_TOKENS: 'Choose tokens',
@@ -133,22 +134,22 @@ export const AddLiquidity = () => {
 
     return (
         <AddLiquidityWrapper>
-            {isError && <div>This LP doesn't exists, you will set the initial price!</div>}
             <AddLiquidityHeader>
                 <span className="swap">Add Liquidity</span>
             </AddLiquidityHeader>
             <AddLiquidityBox
                 defaultToken={zeroAddress}
-                value={value[0]}
+                value={isNaN(value[0]) ? '0' : value[0]}
                 onChange={setValueFn(0)}
                 onTokenChange={setToken0}
             />
             <AddLiquidityBox
                 defaultToken={zeroAddress}
-                value={value[1]}
+                value={isNaN(value[1]) ? '0' : value[1]}
                 onChange={setValueFn(1)}
                 onTokenChange={setToken1}
             />
+            <LiquiditySummary {...{ token0, token1, data, isError }} />
             <AddLiquidityActionButtonWrapper>
                 <AddLiquidityActionButton loading={(loading > 0).toString()} onClick={onSubmit}>
                     {buttonText}

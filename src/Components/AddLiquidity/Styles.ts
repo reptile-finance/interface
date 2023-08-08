@@ -99,3 +99,27 @@ export const AddLiquidityInputNumber = styled.div`
         border: 1px solid ${(props) => props.theme.accentColor};
     }
 `;
+
+export const LiquiditySummaryWrapper = styled.div`
+    ${swapPadding}
+    margin: ${(props) => props.theme.boxPadding};
+    border: 1px solid ${(props) => props.theme.borderColor};
+    border-radius: ${(props) => props.theme.borderRadius};
+    background: ${(props) => props.theme.background3};
+
+    .error {
+        text-align: center;
+    }
+`;
+
+export const LiquditySummaryLpWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    font-weight: ${(props) => props.theme.bolderFont};
+`;
+
+export const LiquditySummaryLpRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+`;
