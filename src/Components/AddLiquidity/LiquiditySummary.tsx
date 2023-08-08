@@ -49,13 +49,13 @@ export const LiquiditySummary: React.FC<{
                         </span>
                     </LiquditySummaryLpRow>
                     <LiquditySummaryLpRow>
-                        <span>Reserves 0</span>
+                        <span>Reserves {token0.symbol}</span>
                         <span>
                             {formatEther(data[0])} {token0.symbol}
                         </span>
                     </LiquditySummaryLpRow>
                     <LiquditySummaryLpRow>
-                        <span>Reserves 1</span>
+                        <span>Reserves {token1.symbol}</span>
                         <span>
                             {formatEther(data[1])} {token1.symbol}
                         </span>
