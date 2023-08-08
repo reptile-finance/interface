@@ -1,6 +1,6 @@
 import styled, { css, keyframes } from 'styled-components';
 
-export const Button = styled.button<{ loading?: boolean; disabled?: boolean }>`
+export const Button = styled.button<{ loading?: string; disabled?: boolean }>`
     border-radius: ${(props) => props.theme.borderRadius};
     background: ${(props) => props.theme.accentBackground};
     border: 1px solid ${(props) => props.theme.accentColor};
@@ -22,7 +22,7 @@ export const Button = styled.button<{ loading?: boolean; disabled?: boolean }>`
         `}
 
     ${(p) =>
-        p.loading &&
+        p.loading === 'true' &&
         css`
             color: #fff;
             background-size: 300% 300%;

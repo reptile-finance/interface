@@ -7,22 +7,14 @@ import {
     AddLiquidityWrapper,
 } from './Styles';
 import { AddLiquidityBox } from './AddLiquidityBox';
-import { TokenMetadata } from '../../Types';
 import { eventBus } from '../../Bus';
 import { Notification } from '../Notifications';
-import { erc20ABI, useContractReads, useWalletClient } from 'wagmi';
-import { useConfig } from '../../Hooks/useConfig';
-import { Config } from '../../Config';
 import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
 import { waitForTransaction } from 'wagmi/actions';
 import { useLiquidity } from '../../Hooks/useLiquidity';
 import { usePool2 } from '../../Hooks/usePool2';
-
-const ERC20Config = {
-    abi: erc20ABI,
-    functionName: 'allowance',
-};
+import { useAddLiquidity } from './useAddLiquidity';
 
 const STATES: { [state: string]: string } = {
     WRONG_TOKENS: 'Choose tokens',
@@ -32,58 +24,21 @@ const STATES: { [state: string]: string } = {
 
 export const AddLiquidity = () => {
     const { addLiquidity } = useLiquidity();
-    const [value, setValue] = useState<[string, string]>(['', '']);
-    const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
-    const [token1, setToken1] = useState<TokenMetadata | undefined>(undefined);
-    const { activeChainConfig } = useConfig();
-    const { data: wallet } = useWalletClient();
+    const {
+        value,
+        setValue,
+        token0,
+        setToken0,
+        token1,
+        setToken1,
+        isEnoughAllowance0,
+        isEnoughAllowance1,
+        uniswapConfig,
+        activeChainConfig,
+    } = useAddLiquidity();
     const { approve } = useERC20();
     const [loading, setLoading] = useState(0);
     const { data, isError } = usePool2({ token0: token0?.address, token1: token1?.address });
-
-    const uniswapConfig = useMemo(() => {
-        return Config[activeChainConfig.id.toString()];
-    }, [activeChainConfig.id]);
-
-    const { data: allowances } = useContractReads({
-        contracts: [
-            {
-                ...(token0 && token0.address !== zeroAddress
-                    ? {
-                          address: token0.address,
-                          args: [wallet.account.address, uniswapConfig.router],
-                          chainId: activeChainConfig.id,
-                          ...ERC20Config,
-                      }
-                    : {}),
-                ...(token1 && token1.address !== zeroAddress
-                    ? {
-                          address: token1.address,
-                          args: [wallet.account.address, uniswapConfig.router],
-                          chainId: activeChainConfig.id,
-                          ...ERC20Config,
-                      }
-                    : {}),
-            },
-        ],
-        watch: true,
-    });
-
-    const isEnoughAllowance0 = useMemo(() => {
-        if (!allowances || !token0) return false;
-        if (token0.address === zeroAddress) return true;
-        const allowance = allowances[0];
-        const amount = parseFormattedBalance(value[0], token0.decimals);
-        return allowance && BN(allowance.result.toString()).gte(BN(amount));
-    }, [allowances, token0, value]);
-
-    const isEnoughAllowance1 = useMemo(() => {
-        if (!allowances || !token1) return false;
-        if (token1.address === zeroAddress) return true;
-        const allowance = allowances.length > 1 ? allowances[1] : allowances[0];
-        const amount = parseFormattedBalance(value[1], token1.decimals);
-        return allowance && BN(allowance.result.toString()).gte(BN(amount));
-    }, [allowances, token1, value]);
 
     const state = useMemo((): keyof typeof STATES => {
         if (token0 === token1 || !token0 || !token1) return 'WRONG_TOKENS';
@@ -173,7 +128,7 @@ export const AddLiquidity = () => {
                 return newState;
             });
         },
-        [data, isError],
+        [data, isError, setValue],
     );
 
     return (
@@ -195,7 +150,7 @@ export const AddLiquidity = () => {
                 onTokenChange={setToken1}
             />
             <AddLiquidityActionButtonWrapper>
-                <AddLiquidityActionButton loading={loading > 0} onClick={onSubmit}>
+                <AddLiquidityActionButton loading={(loading > 0).toString()} onClick={onSubmit}>
                     {buttonText}
                 </AddLiquidityActionButton>
             </AddLiquidityActionButtonWrapper>
