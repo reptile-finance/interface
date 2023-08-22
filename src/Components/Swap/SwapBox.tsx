@@ -1,23 +1,43 @@
 import { SwapBoxToken, SwapInputBox, SwapInputNumber, SwapInputTokenBalances } from './Styles';
 import { useBalances } from '../../Hooks/useBalances';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { formatBalance } from '../../Utils/Bignumber';
 import { TokenSelector } from '../TokenSelector';
 import { EthAddress } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
 
-export const SwapBox: React.FC<{ defaultToken?: EthAddress }> = ({ defaultToken }) => {
+export interface SwapBoxData {
+    token: EthAddress;
+    amount: string;
+}
+
+export const SwapBox: React.FC<{ value: SwapBoxData, onChange: (_: SwapBoxData) => void }> = ({ value, onChange }) => {
     const { getBalance } = useBalances();
     const [selectorOpen, setSelectorOpen] = useState(false);
-    const [token, setToken] = useState<EthAddress | undefined>(defaultToken ?? undefined);
+    const [amount, setAmount] = useState<string | undefined>();
+    const [token, setToken] = useState<EthAddress | undefined>(value.token ?? undefined);
     const { data, isLoading, isError } = useToken({
         address: token,
     });
+
+    useEffect(() => {
+        if (token) {
+            onChange({
+                token,
+                amount: amount ?? '0',
+            });
+        }
+    }, [token, amount]);
 
     const balance = useMemo(() => {
         if (!token) return '0';
         return formatBalance(getBalance(token), 4, data?.decimals ?? 18);
     }, [data, getBalance, token]);
+
+
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setAmount(e.target.value);
+    }
 
     const BalanceInfo = useMemo(() => {
         if (isLoading || !data || isError) {
@@ -45,7 +65,7 @@ export const SwapBox: React.FC<{ defaultToken?: EthAddress }> = ({ defaultToken 
                     <BalanceInfo />
                 </SwapInputTokenBalances>
                 <SwapInputNumber>
-                    <input type="decimals" placeholder="0.0" />
+                    <input type="decimals" placeholder="0.0" value={amount} onChange={handleAmountChange}/>
                 </SwapInputNumber>
             </SwapInputBox>
             <TokenSelector
