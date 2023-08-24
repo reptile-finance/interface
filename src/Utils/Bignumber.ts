@@ -2,7 +2,13 @@ import BNjs from 'bignumber.js';
 
 export const BigNumber = (arg: BNjs.Value, base?: number) => new BNjs(arg, base);
 
-export const BN = BigNumber;
+export const BN = (arg: BNjs.Value | bigint, base?: number) => {
+    let num = arg;
+    if (typeof num === 'bigint') {
+        num = num.toString();
+    }
+    return BigNumber(num, base);
+};
 
 export const isNumber = (num: string | number) => !BigNumber(num).isNaN();
 

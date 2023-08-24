@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react';
 import { TokenMetadata } from '../../Types';
 import { zeroAddress } from 'viem';
 import { useWalletClient, useContractReads, erc20ABI } from 'wagmi';
-import { Config } from '../../Config';
 import { useConfig } from '../../Hooks/useConfig';
 import { parseFormattedBalance, BN } from '../../Utils/Bignumber';
+import { useUniswap } from '../../Hooks/useUniswap';
 
 const ERC20Config = {
     abi: erc20ABI,
@@ -17,10 +17,7 @@ export const useAddLiquidity = () => {
     const { activeChainConfig } = useConfig();
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
     const [token1, setToken1] = useState<TokenMetadata | undefined>(undefined);
-
-    const uniswapConfig = useMemo(() => {
-        return Config[activeChainConfig.id.toString()];
-    }, [activeChainConfig.id]);
+    const { uniswapConfig } = useUniswap();
 
     const { data: allowances } = useContractReads({
         contracts: [

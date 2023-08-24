@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { EthAddress } from '../Types';
-import { useWalletClient } from 'wagmi';
-import ERC20ABI from '../ABI/ERC20.json';
+import { erc20ABI, useWalletClient } from 'wagmi';
 import { prepareWriteContract } from 'wagmi/actions';
 import { useConfig } from './useConfig';
 
@@ -16,7 +15,7 @@ export const useERC20 = () => {
             }
             const { request } = await prepareWriteContract({
                 address: tokenAddress,
-                abi: ERC20ABI,
+                abi: erc20ABI,
                 functionName: 'transfer',
                 args: [to, amount],
                 chain: activeChainConfig.id,
@@ -34,7 +33,7 @@ export const useERC20 = () => {
             }
             const { request } = await prepareWriteContract({
                 address: tokenAddress,
-                abi: ERC20ABI,
+                abi: erc20ABI,
                 functionName: 'approve',
                 args: [to, amount],
                 chain: activeChainConfig.id,

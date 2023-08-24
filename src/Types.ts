@@ -6,7 +6,7 @@ export type AppConfig = {
     };
 };
 
-export interface UniswapAddLiquidity {
+export type UniswapAddLiquidity = {
     token0: EthAddress;
     token1: EthAddress;
     amount0Desired: string;
@@ -15,7 +15,11 @@ export interface UniswapAddLiquidity {
     amount1Min?: string;
     to?: EthAddress;
     deadline?: number | string | bigint;
-}
+};
+
+export type UniswapRemoveLiquidity = Omit<UniswapAddLiquidity, 'amount0Desired' | 'amount1Desired'> & {
+    liquidity: string;
+};
 
 export interface TokenMetadata {
     name: string;

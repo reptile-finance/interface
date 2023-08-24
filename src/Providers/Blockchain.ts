@@ -37,7 +37,7 @@ export const opBnbChain: Chain = {
 };
 
 const { chains, publicClient } = configureChains([opBnbChain], [publicProvider()], {
-    pollingInterval: 3_000, // Multicall polling interval
+    pollingInterval: 2_500, // Multicall polling interval
 });
 
 const { connectors } = getDefaultWallets({
