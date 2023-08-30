@@ -11,7 +11,7 @@ import {
     RemoveLiquidityWrapper,
 } from './Styles';
 import { useAccount, useBalance } from 'wagmi';
-import { BN, isNaN, toPresentationLength } from '../../Utils/Bignumber';
+import { BN, formatBalance, isNaN, parseFormattedBalance, toPresentationLength } from '../../Utils/Bignumber';
 import { useRemoveLiquidity } from './useRemoveLiquidity';
 import { eventBus } from '../../Bus';
 import { Notification } from '../Notifications';
@@ -21,7 +21,7 @@ import { useConfig } from '../../Hooks/useConfig';
 const STATES: { [state: string]: string } = {
     APPROVE: 'Approve',
     WRONG_AMOUNT: 'Wrong amount',
-    ADD_LIQUIDITY: 'Remove liquidity',
+    REMOVE_LIQUIDITY: 'Remove liquidity',
 };
 
 export const RemoveLiquidity: React.FC<{
@@ -31,7 +31,7 @@ export const RemoveLiquidity: React.FC<{
     token1: EthAddress;
     pool: EthAddress;
 }> = ({ isOpen, onClose, token0, token1, pool }) => {
-    const { isEnoughAllowance, setValue, value, token0Data, token1Data, approveLpToken, removeLiquidity } =
+    const { isEnoughAllowance, setValue, value, token0Data, token1Data, poolToken, approveLpToken, removeLiquidity } =
         useRemoveLiquidity(pool, token0, token1);
     const [loading, setLoading] = useState(0);
     const account = useAccount();
@@ -45,39 +45,33 @@ export const RemoveLiquidity: React.FC<{
         address: account.address,
     });
 
-    const aToB = useMemo(() => {
-        if (!data) return '0';
-        return BN(data[0].toString()).div(BN(data[1].toString())).toFixed();
-    }, [data]);
-
-    const bToA = useMemo(() => {
-        if (!data) return '0';
-        return BN(data[1].toString()).div(BN(data[0].toString())).toFixed();
-    }, [data]);
-
     const token0Return = useMemo(() => {
-        if (!data) return '0';
-        const val = BN(value ? value : '0')
-            .times(BN(aToB))
+        if (!data || !poolToken || !value) return '0';
+        const formatted = parseFormattedBalance(value, poolToken.decimals);
+        const val = BN(formatted)
+            .div(poolToken.totalSupply.value.toString())
+            .multipliedBy(data[0].toString())
             .dp(10)
             .toFixed();
-        return isNaN(val) ? '0' : val;
-    }, [aToB, data, value]);
+        return isNaN(val) ? '0' : formatBalance(val, token0Data?.decimals);
+    }, [data, poolToken, token0Data?.decimals, value]);
 
     const token1Return = useMemo(() => {
-        if (!data) return '0';
-        const val = BN(value ? value : '0')
-            .times(BN(bToA))
+        if (!data || !poolToken || !value) return '0';
+        const formatted = parseFormattedBalance(value, poolToken.decimals);
+        const val = BN(formatted)
+            .div(poolToken.totalSupply.value.toString())
+            .multipliedBy(data[1].toString())
             .dp(10)
             .toFixed();
-        return isNaN(val) ? '0' : val;
-    }, [bToA, data, value]);
+        return isNaN(val) ? '0' : formatBalance(val, token1Data?.decimals);
+    }, [data, poolToken, token1Data?.decimals, value]);
 
     const state = useMemo((): keyof typeof STATES => {
         if ((balanceData && value && BN(balanceData.formatted).lt(BN(value))) || !value || BN(value).isZero())
             return 'WRONG_AMOUNT';
         if (!isEnoughAllowance) return 'APPROVE';
-        return 'ADD_LIQUIDITY';
+        return 'REMOVE_LIQUIDITY';
     }, [balanceData, isEnoughAllowance, value]);
 
     const onSubmit = useCallback(async () => {
@@ -91,8 +85,8 @@ export const RemoveLiquidity: React.FC<{
                     await removeLiquidity({
                         token0,
                         token1,
-                        amount0Min: aToB,
-                        amount1Min: bToA,
+                        amount0Min: token0Return,
+                        amount1Min: token1Return,
                         liquidity: value,
                     }).then((hash) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
                     break;
@@ -103,7 +97,17 @@ export const RemoveLiquidity: React.FC<{
         } finally {
             setLoading((st) => (st -= 1));
         }
-    }, [aToB, activeChainConfig.id, approveLpToken, bToA, removeLiquidity, state, token0, token1, value]);
+    }, [
+        activeChainConfig.id,
+        approveLpToken,
+        removeLiquidity,
+        state,
+        token0,
+        token0Return,
+        token1,
+        token1Return,
+        value,
+    ]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Remove Liquidity">

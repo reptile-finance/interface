@@ -11,6 +11,7 @@ import UniswapV2Router02ABI from '../../ABI/UniswapV2Router02.json';
 import { writeContract } from 'viem/contract';
 
 export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1: EthAddress) => {
+    const { address } = useAccount();
     const { data: wallet } = useWalletClient();
     const [value, setValue] = useState<string>('');
     const { activeChainConfig } = useConfig();
@@ -18,7 +19,7 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
     const { approve } = useERC20();
     const { data } = useContractRead({
         address: pool,
-        args: [wallet.account.address, uniswapConfig.router],
+        args: [address, uniswapConfig.router],
         chainId: activeChainConfig.id,
         abi: erc20ABI,
         functionName: 'allowance',
@@ -72,13 +73,23 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
             const liquidityAmount = parseFormattedBalance(liquidity, poolToken?.decimals);
             const reducedDeadline = deadline ?? Math.floor(Date.now() / 1000) + 60; // 1 minute from the current Unix time in Seconds
             const reducedTo = to ?? wallet.account.address;
-            const amount0DesiredFormatted = parseFormattedBalance(amount0Min, token0Data.decimals);
-            const amount1DesiredFormatted = parseFormattedBalance(amount1Min, token1Data.decimals);
+            const [amount0, amount1] = BN(token0).isLessThan(token1)
+                ? [amount0Min, amount1Min]
+                : [amount1Min, amount0Min];
+            const amount0DesiredFormatted = parseFormattedBalance(
+                BN(amount0).multipliedBy(0.99).toString(),
+                token0Data.decimals,
+            );
+            const amount1DesiredFormatted = parseFormattedBalance(
+                BN(amount1).multipliedBy(0.99).toString(),
+                token1Data.decimals,
+            );
+            const [t0, t1] = BN(token0).isLessThan(token1) ? [token0, token1] : [token1, token0];
 
             if (functionName === 'removeLiquidityETH') {
                 return removeLiquidityETH({
-                    token0,
-                    token1,
+                    token0: t0,
+                    token1: t1,
                     liquidity: liquidityAmount,
                     deadline: reducedDeadline,
                     to: reducedTo,
@@ -92,8 +103,8 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
                 functionName,
                 walletClient: wallet,
                 args: [
-                    token0,
-                    token1,
+                    t0,
+                    t1,
                     liquidityAmount,
                     amount0DesiredFormatted,
                     amount1DesiredFormatted,
@@ -104,7 +115,15 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
             });
             return writeContract(wallet, request);
         },
-        [activeChainConfig, poolToken?.decimals, uniswapConfig.router, wallet],
+        [
+            activeChainConfig,
+            poolToken?.decimals,
+            removeLiquidityETH,
+            token0Data?.decimals,
+            token1Data?.decimals,
+            uniswapConfig.router,
+            wallet,
+        ],
     );
 
     return { isEnoughAllowance, setValue, approveLpToken, removeLiquidity, value, poolToken, token0Data, token1Data };
