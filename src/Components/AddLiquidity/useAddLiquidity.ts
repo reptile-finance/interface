@@ -25,7 +25,7 @@ export const useAddLiquidity = () => {
                 ...(token0 && token0.address !== zeroAddress
                     ? {
                           address: token0.address,
-                          args: [wallet.account.address, uniswapConfig.router],
+                          args: [wallet?.account?.address ?? zeroAddress, uniswapConfig.router],
                           chainId: activeChainConfig.id,
                           ...ERC20Config,
                       }
@@ -33,7 +33,7 @@ export const useAddLiquidity = () => {
                 ...(token1 && token1.address !== zeroAddress
                     ? {
                           address: token1.address,
-                          args: [wallet.account.address, uniswapConfig.router],
+                          args: [wallet?.account?.address ?? zeroAddress, uniswapConfig.router],
                           chainId: activeChainConfig.id,
                           ...ERC20Config,
                       }
@@ -41,6 +41,7 @@ export const useAddLiquidity = () => {
             },
         ],
         watch: true,
+        enabled: !!wallet?.account?.address,
     });
 
     const isEnoughAllowance0 = useMemo(() => {
