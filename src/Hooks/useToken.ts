@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EthAddress } from '../Types';
 import { fetchToken } from 'wagmi/actions';
-import { useNetwork } from 'wagmi';
 import { zeroAddress } from 'viem';
 import { useRecoilState } from 'recoil';
 import { TokensState } from '../State/Tokens';
@@ -11,12 +10,11 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
     const [isLoading, setLoading] = useState(false);
     const [isError, setError] = useState(false);
     const [tokens, setTokens] = useRecoilState(TokensState);
-    const { chains } = useNetwork();
-    const { config } = useConfig();
+    const { config, activeChainConfig } = useConfig();
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
-        const chainCfg = chains.find((c) => c.id.toString() === config.id);
+        const chainCfg = activeChainConfig;
         if (!address || !chainCfg) return;
         setLoading(true);
 
@@ -59,14 +57,14 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [address, chains, config.id, isLoading, setTokens]);
+    }, [address, activeChainConfig, config.id, isLoading, setTokens]);
 
     useEffect(() => {
         if (!address) return;
         if (tokens[config.id] && tokens[config.id][address.toLowerCase() as EthAddress]) return;
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [address, chains]);
+    }, [address, activeChainConfig]);
 
     const data = useMemo(() => {
         if (!address || !tokens[config.id]) return undefined;
