@@ -11,17 +11,48 @@ export const useRouter = () => {
 
     const getAmountsOut = useCallback(
         async (amountIn: string, path: Address[]) => {
-            const data = await readContract({
+            const data: bigint[] = await readContract({
                 address: uniswapConfig.router,
                 abi: UniswapV2Router02ABI,
                 functionName: 'getAmountsOut',
                 args: [amountIn, path],
                 chainId: Number(activeChainConfig.id),
-            });
+            }) as bigint[];
 
-            return data as bigint;
+            return data.map((value) => value.toString());
         }
     , [uniswapConfig.router]);
 
-    return { getAmountsOut };
+    const getAmountsIn = useCallback(
+        async (amountOut: string, path: Address[]) => {
+            const data: bigint[] = await readContract({
+                address: uniswapConfig.router,
+                abi: UniswapV2Router02ABI,
+                functionName: 'getAmountsIn',
+                args: [amountOut, path],
+                chainId: Number(activeChainConfig.id),
+            }) as bigint[];
+
+            return data.map((value) => value.toString());
+        }
+    , [uniswapConfig.router]);
+
+    const getPair = useCallback(
+        async (tokenA: Address, tokenB: Address) => {
+            const data: Address = await readContract({
+                address: uniswapConfig.factory,
+                abi: UniswapV2Router02ABI,
+                functionName: 'getPair',
+                args: [tokenA, tokenB],
+                chainId: Number(activeChainConfig.id),
+            }) as Address;
+
+            return data;
+        }
+    , [uniswapConfig.factory]);
+
+    
+    
+
+    return { getAmountsOut, getAmountsIn, getPair };
 }

@@ -1,6 +1,27 @@
+import { useEffect, useState } from 'react';
+import { EthAddress } from '../../Types';
 import { SwapDetailContent, SwapDetailRow, SwapDetailWrapper } from './Styles';
+import { fetchToken } from 'wagmi/actions';
 
-export const SwapDetail = () => {
+export const SwapDetail: React.FC<{
+    path: EthAddress[];
+}> = ({
+    path,
+}) => {
+    
+    const [tokenSymbols, setTokenSymbols] = useState<string[] | undefined>(undefined);
+
+    useEffect(() => {
+        if (!path) return;
+    
+        Promise.all(path.map(async (address) => {
+            const token = await fetchToken({address});
+            return token.symbol;
+        })).then(setTokenSymbols);
+
+    }, [path]);
+
+
     return (
         <SwapDetailWrapper>
             <SwapDetailContent>
@@ -22,7 +43,7 @@ export const SwapDetail = () => {
                 </SwapDetailRow>
                 <SwapDetailRow>
                     <span>Route</span>
-                    <span>BNB &gt; REPT</span>
+                    <span>{tokenSymbols ? tokenSymbols.join(" > ") : "undefined"}</span>
                 </SwapDetailRow>
             </SwapDetailContent>
         </SwapDetailWrapper>

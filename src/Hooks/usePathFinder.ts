@@ -6,50 +6,49 @@ import { useRouter } from "./useRouter";
 type PoolData = [`0x${string}`, `0x${string}`, `0x${string}`]
 
 export const usePathFinder = () => {
-    const { getAmountsOut } = useRouter();
+    const { getAmountsOut, getAmountsIn } = useRouter();
     const { getPools, pools } = usePools();
 
     
     const getBestPathWithWithExactIn = useCallback(
         async (tokenIn: Address, tokenOut: Address, amountIn: string) => {
 
-            console.log('Obteniendo el mejor camino con exactIn...');
+            if (compareAddress(tokenIn, tokenOut)) {
+                console.log("tokenIn and tokenOut are the same");
+                return [];
+            }
 
-            console.log('Tokens de entrada:', tokenIn);
-            console.log('Tokens de salida:', tokenOut);
-            console.log('Cantidad de tokens de entrada:', amountIn);
+            if (amountIn === "0") {
+                console.log("amountIn is 0");
+                return [];
+            }
 
-            console.log('Obteniendo pools...');
             const pools = await getPools();
-            console.log('Pools obtenidos:', pools);
+
             
-            console.log('Obteniendo todos los caminos...');
+
             const allPaths = getAllPaths(tokenIn, tokenOut, pools);
-            console.log('Todos los caminos obtenidos:', allPaths);
 
-            console.log('Obteniendo el mejor camino...');
-            const bestPath = await getBestPath(allPaths, amountIn);
-            console.log('Mejor camino obtenido:', bestPath);
 
-            console.log('Convirtiendo datos de la piscina a la ruta...');
-            const path = poolDataArrayToPath(bestPath);
-            console.log('Ruta obtenida:', path);
 
-            return path;
+            const bestPath = await getBestPathIn(allPaths, amountIn);
+
+            return bestPath;
+
         }
     , [getAmountsOut, pools]);
     
 
-    const containsPool = (pairs: PoolData[], pair: PoolData): boolean => {
-        return pairs.some((_pair) => compareAddress(_pair[2], pair[2]));
+    const pathContainsToken = (path: Address[], token: Address): boolean => {
+        return path.includes(token);
     }
 
     const getAllPaths = (tokenSource: Address, tokenDestination: Address, pools: PoolData[] ) =>  {
-        const paths: PoolData[][] = [];
+        const paths: Address[][] = [];
         const MAX_DEPTH = 3;
 
-        const computeRoute  = (currentRoute: PoolData[], depth: number) => {
-            if (currentRoute.length !== 0 && compareAddress(currentRoute[currentRoute.length - 1][1], tokenDestination)) {
+        const computeRoute  = (currentRoute: Address[], depth: number) => {
+            if (compareAddress(currentRoute[currentRoute.length - 1], tokenDestination)) {
                 paths.push(currentRoute);
                 return;
             }
@@ -59,47 +58,98 @@ export const usePathFinder = () => {
             }
 
             for(let i = 0; i < pools.length; i++) {
+                
+                const tokenOut  = tokenOutWhenSwapPool(pools[i], currentRoute[currentRoute.length - 1]);
 
-                if (containsPool(currentRoute, pools[i])) {
+                if (!tokenOut) {
                     continue;
                 }
 
-                if (currentRoute.length === 0 ) {
-                    if (compareAddress(tokenSource, pools[i][0])) {
-                        continue;
-                    }
-                }
-                else if (compareAddress(currentRoute[currentRoute.length - 1][1], pools[i][1])) {
-                        continue;
+                if (pathContainsToken(currentRoute, tokenOut)) {
+                    continue;
                 }
 
-                computeRoute([...currentRoute, pools[i]], depth + 1);
+
+                computeRoute([...currentRoute, tokenOut], depth + 1);
             }
         }
 
-        computeRoute([], 0);
+        computeRoute([tokenSource], 0);
 
         return paths;
     }
 
-    async function getBestPath(paths: PoolData[][], amountIn: string): Promise<PoolData[] | null> {
+    async function getBestPathIn(paths: Address[][], amountIn: string): Promise<Address[]> {
         const amountsOut = await Promise.all(paths.map(async (path) => {
             try {
-                return await getAmountsOut(amountIn, poolDataArrayToPath(path));
+                const amountOut =  await getAmountsOut(amountIn, path);
+
+                return amountOut[amountOut.length - 1];
             } catch (error) {
-                return BigInt(0);
+                return "0";
             }
         }));
     
-        return paths[amountsOut.indexOf(maxBigInt(...amountsOut))];
+        const maxAmountOutIndex = amountsOut.indexOf(maxBigInt(...amountsOut.map(amount => BigInt(amount))).toString());
+        return paths[maxAmountOutIndex] ?? [];
     }
 
-    const poolDataArrayToPath = (poolData: PoolData[]): Address[] => {
-        if (poolData.length === 0) {
-            return [];
+    const getBestPathWithExactOut = useCallback(
+        async (tokenIn: Address, tokenOut: Address, amountOut: string) => {
+
+            if (compareAddress(tokenIn, tokenOut)) {
+                console.log("tokenIn and tokenOut are the same");
+                return [];
+            }
+
+            if (amountOut === "0") {
+                console.log("amountOut is 0");
+                return [];
+            }
+
+            
+
+            const pools = await getPools();
+
+            const allPaths = getAllPaths(tokenIn, tokenOut, pools);
+
+            const bestPath = await getBestPathOut(allPaths, amountOut);
+
+            return bestPath;
+
         }
-        return poolData.map((pool) => pool[0]).concat([poolData[poolData.length - 1][1]]);
+    , [getAmountsIn, pools]);
+
+    async function getBestPathOut(paths: Address[][], amountOut: string): Promise<Address[]> {
+        const amountsIn = await Promise.all(paths.map(async (path) => {
+            try {
+                const amountIn =  await getAmountsIn(amountOut, path);
+
+                console.log(amountIn);
+                return amountIn[0];
+            } catch (error) {
+                return undefined;
+            }
+        }));
+
+        console.log("amounts in:", amountsIn);
+
+
+
+    
+        const minAmountInIndex = amountsIn.indexOf(minBigInt(...amountsIn.filter((value) => value != undefined).map(amount => BigInt(amount))).toString());
+        // Devuelve el camino con el mínimo valor que no sea 0
+
+        console.log("minAmount", minBigInt(...amountsIn.filter((value) => value != undefined).map(amount => BigInt(amount))).toString());
+        return paths[minAmountInIndex] ?? [];
     }
+
+    const minBigInt = (...values: bigint[]): bigint | undefined => {
+        return values.reduce((min, value) => !min || value < min ? value : min);
+    }
+
+    
+
 
     const maxBigInt = (...values: bigint[]): bigint => {
         return values.reduce((max, value) => value > max ? value : max);
@@ -108,6 +158,19 @@ export const usePathFinder = () => {
     const compareAddress = (a: Address, b: Address): boolean => {
         return a.toLocaleLowerCase() === b.toLocaleLowerCase();
     }
+    
 
-    return { getBestPathWithWithExactIn };
+    const tokenOutWhenSwapPool = (pool: PoolData, tokenIn: Address): Address | undefined => {
+        if (compareAddress(pool[0], tokenIn)) {
+            return pool[1];
+        }
+        else if (compareAddress(pool[1], tokenIn)) {
+            return pool[0];
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    return { getBestPathWithWithExactIn, getBestPathWithExactOut };
 }

@@ -3,31 +3,25 @@ import { useBalances } from '../../Hooks/useBalances';
 import { useEffect, useMemo, useState } from 'react';
 import { formatBalance } from '../../Utils/Bignumber';
 import { TokenSelector } from '../TokenSelector';
-import { EthAddress } from '../../Types';
+import { EthAddress, TokenMetadata } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
 
-export interface SwapBoxData {
-    token: EthAddress;
-    amount: string;
-}
 
-export const SwapBox: React.FC<{ value: SwapBoxData, onChange: (_: SwapBoxData) => void }> = ({ value, onChange }) => {
+export const SwapBox: React.FC<{
+    defaultToken?: EthAddress;
+    onTokenChange?: (token: TokenMetadata) => void;
+    onChange?: (v: string) => void;
+    value: string;
+    loading?: boolean;
+}> = ({ defaultToken, value, onChange, onTokenChange, loading }) => {
     const { getBalance } = useBalances();
     const [selectorOpen, setSelectorOpen] = useState(false);
-    const [amount, setAmount] = useState<string | undefined>();
-    const [token, setToken] = useState<EthAddress | undefined>(value.token ?? undefined);
+
+    const [token, setToken] = useState<EthAddress | undefined>(defaultToken ?? undefined);
     const { data, isLoading, isError } = useToken({
         address: token,
     });
 
-    useEffect(() => {
-        if (token) {
-            onChange({
-                token,
-                amount: amount ?? '0',
-            });
-        }
-    }, [token, amount]);
 
     const balance = useMemo(() => {
         if (!token) return '0';
@@ -35,9 +29,12 @@ export const SwapBox: React.FC<{ value: SwapBoxData, onChange: (_: SwapBoxData) 
     }, [data, getBalance, token]);
 
 
-    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setAmount(e.target.value);
-    }
+    useEffect(() => {
+        if (token) {
+            onTokenChange && onTokenChange(data);
+        }
+    }, [data, onTokenChange, token]);
+
 
     const BalanceInfo = useMemo(() => {
         if (isLoading || !data || isError) {
@@ -65,13 +62,17 @@ export const SwapBox: React.FC<{ value: SwapBoxData, onChange: (_: SwapBoxData) 
                     <BalanceInfo />
                 </SwapInputTokenBalances>
                 <SwapInputNumber>
-                    <input type="decimals" placeholder="0.0" value={amount} onChange={handleAmountChange}/>
+                    {
+                        loading ?  <span>Loading...</span>
+                     : <input type="decimals" placeholder="0.0" value={value} onChange={(evt) => onChange(evt.currentTarget.value)}/>
+                    }
+                    
                 </SwapInputNumber>
             </SwapInputBox>
             <TokenSelector
                 open={selectorOpen}
                 setOpen={(isOpen) => setSelectorOpen(isOpen)}
-                setToken={(token) => setToken(token)}
+                setToken={setToken}
             />
         </>
     );
