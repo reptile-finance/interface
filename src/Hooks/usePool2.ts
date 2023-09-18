@@ -12,25 +12,25 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
     const [isLoading, setLoading] = useState(false);
     const [isError, setError] = useState(false);
     const { chains } = useNetwork();
-    const { config } = useConfig();
+    const { config, activeChainConfig } = useConfig();
     const { uniswapConfig } = useUniswap();
     const [reserves, setReserves] = useState<[bigint, bigint]>([0n, 0n]);
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
-        const chainCfg = chains.find((c) => c.id.toString() === config.id);
-        if (!chainCfg || !token0 || !token1 || !uniswapConfig.uniswapHelper || !config) return;
+        if (!activeChainConfig || !token0 || !token1 || !uniswapConfig.uniswapHelper || !config) return;
         setLoading(true);
 
         const reducedToken0 = token0 === zeroAddress ? uniswapConfig.weth : token0;
         const reducedToken1 = token1 === zeroAddress ? uniswapConfig.weth : token1;
+        console.log('🚀 ~ file: usePool2.ts:27 ~ fetchData ~ reducedToken1:', reducedToken1);
 
         readContract({
             address: uniswapConfig.uniswapHelper,
             abi: UniswapHelperABI,
             functionName: 'getReserves',
             args: [uniswapConfig.factory, reducedToken0, reducedToken1],
-            chainId: Number(chainCfg.id),
+            chainId: Number(activeChainConfig.id),
         })
             .then((data: [bigint, bigint, bigint]) => {
                 setReserves([data[0], data[1]]);
@@ -44,7 +44,7 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
             .finally(() => {
                 setLoading(false);
             });
-    }, [chains, config, isLoading, token0, token1, uniswapConfig]);
+    }, [activeChainConfig, config, isLoading, token0, token1, uniswapConfig]);
 
     useEffect(() => {
         fetchData();

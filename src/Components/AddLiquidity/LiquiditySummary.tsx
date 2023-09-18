@@ -32,6 +32,7 @@ export const LiquiditySummary: React.FC<{
                             {BN(1)
                                 .multipliedBy(BN(data[1].toString() || 0))
                                 .div(BN(data[0].toString() || 0))
+                                .dp(6)
                                 .toFixed()}{' '}
                             {token1.symbol}
                         </span>
@@ -44,6 +45,7 @@ export const LiquiditySummary: React.FC<{
                             {BN(1)
                                 .multipliedBy(BN(data[0].toString() || 0))
                                 .div(BN(data[1].toString() || 0))
+                                .dp(6)
                                 .toFixed()}{' '}
                             {token0.symbol}
                         </span>
@@ -51,13 +53,13 @@ export const LiquiditySummary: React.FC<{
                     <LiquditySummaryLpRow>
                         <span>Reserves {token0.symbol}</span>
                         <span>
-                            {formatEther(data[0])} {token0.symbol}
+                            {BN(formatEther(data[0])).dp(6).toFixed()} {token0.symbol}
                         </span>
                     </LiquditySummaryLpRow>
                     <LiquditySummaryLpRow>
                         <span>Reserves {token1.symbol}</span>
                         <span>
-                            {formatEther(data[1])} {token1.symbol}
+                            {BN(formatEther(data[1])).dp(6).toFixed()} {token1.symbol}
                         </span>
                     </LiquditySummaryLpRow>
                 </LiquditySummaryLpWrapper>
