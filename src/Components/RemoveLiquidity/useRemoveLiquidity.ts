@@ -7,7 +7,7 @@ import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
 import { prepareWriteContract, waitForTransaction } from 'wagmi/actions';
 import { zeroAddress } from 'viem';
-import UniswapV2Router02ABI from '../../ABI/UniswapV2Router02.json';
+import UniswapV2Router02ABI from '../../ABI/UniswapV2Router02';
 import { writeContract } from 'viem/contract';
 
 export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1: EthAddress) => {

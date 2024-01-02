@@ -5,7 +5,7 @@ import { formatBalance } from '../../Utils/Bignumber';
 import { TokenSelector } from '../TokenSelector';
 import { EthAddress, TokenMetadata } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
-
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 export const SwapBox: React.FC<{
     defaultToken?: EthAddress;
@@ -22,19 +22,16 @@ export const SwapBox: React.FC<{
         address: token,
     });
 
-
     const balance = useMemo(() => {
         if (!token) return '0';
         return formatBalance(getBalance(token), 4, data?.decimals ?? 18);
     }, [data, getBalance, token]);
-
 
     useEffect(() => {
         if (token) {
             onTokenChange && onTokenChange(data);
         }
     }, [data, onTokenChange, token]);
-
 
     const BalanceInfo = useMemo(() => {
         if (isLoading || !data || isError) {
@@ -62,18 +59,20 @@ export const SwapBox: React.FC<{
                     <BalanceInfo />
                 </SwapInputTokenBalances>
                 <SwapInputNumber>
-                    {
-                        loading ?  <span>Loading...</span>
-                     : <input type="decimals" placeholder="0.0" value={value} onChange={(evt) => onChange(evt.currentTarget.value)}/>
-                    }
-                    
+                    <input
+                        type="decimals"
+                        placeholder="0.0"
+                        value={value}
+                        onChange={(evt) => onChange(evt.currentTarget.value)}
+                    />
+                    {loading && (
+                        <span className="loading">
+                            <AiOutlineLoading3Quarters />
+                        </span>
+                    )}
                 </SwapInputNumber>
             </SwapInputBox>
-            <TokenSelector
-                open={selectorOpen}
-                setOpen={(isOpen) => setSelectorOpen(isOpen)}
-                setToken={setToken}
-            />
+            <TokenSelector open={selectorOpen} setOpen={(isOpen) => setSelectorOpen(isOpen)} setToken={setToken} />
         </>
     );
 };

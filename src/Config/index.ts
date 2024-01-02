@@ -1,13 +1,15 @@
 import { EthAddress } from '../Types';
 
+export type UniswapConfig = {
+    router: EthAddress;
+    factory: EthAddress;
+    uniswapQuery: EthAddress;
+    uniswapHelper: EthAddress;
+    weth: EthAddress;
+};
+
 export const Config: {
-    [chainId: string]: {
-        router: EthAddress;
-        factory: EthAddress;
-        uniswapQuery: EthAddress;
-        uniswapHelper: EthAddress;
-        weth: EthAddress;
-    };
+    [chainId: string]: UniswapConfig;
 } = {
     '5611': {
         // opBNB testnet

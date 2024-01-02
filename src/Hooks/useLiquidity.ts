@@ -3,7 +3,7 @@ import { useConfig } from './useConfig';
 import { useWalletClient } from 'wagmi';
 import { UniswapAddLiquidity } from '../Types';
 import { zeroAddress } from 'viem';
-import UniswapV2Router02ABI from '../ABI/UniswapV2Router02.json';
+import UniswapV2Router02ABI from '../ABI/UniswapV2Router02';
 import { useTokens } from './useTokens';
 import { BN, parseFormattedBalance } from '../Utils/Bignumber';
 import { prepareWriteContract } from 'wagmi/actions';

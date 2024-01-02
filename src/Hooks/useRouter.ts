@@ -1,7 +1,7 @@
 import { Address } from 'viem';
 import { readContract } from 'wagmi/actions';
 import { useUniswap } from './useUniswap';
-import UniswapV2Router02ABI from '../ABI/UniswapV2Router02.json';
+import UniswapV2Router02ABI from '../ABI/UniswapV2Router02';
 import { useCallback } from 'react';
 import { useConfig } from './useConfig';
 
@@ -36,7 +36,7 @@ export const useRouter = () => {
 
             return data.map((value) => value.toString());
         },
-        [uniswapConfig.router],
+        [activeChainConfig.id, uniswapConfig.router],
     );
 
     const getPair = useCallback(
@@ -51,7 +51,7 @@ export const useRouter = () => {
 
             return data;
         },
-        [uniswapConfig.factory],
+        [activeChainConfig.id, uniswapConfig.factory],
     );
 
     return { getAmountsOut, getAmountsIn, getPair };

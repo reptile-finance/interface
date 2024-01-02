@@ -23,7 +23,6 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
 
         const reducedToken0 = token0 === zeroAddress ? uniswapConfig.weth : token0;
         const reducedToken1 = token1 === zeroAddress ? uniswapConfig.weth : token1;
-        console.log('🚀 ~ file: usePool2.ts:27 ~ fetchData ~ reducedToken1:', reducedToken1);
 
         readContract({
             address: uniswapConfig.uniswapHelper,
