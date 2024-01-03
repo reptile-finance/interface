@@ -4,6 +4,7 @@ import {
     LiquidityWrapper,
     OverviewBalance,
     OverviewContent,
+    SwapBox,
     SwapWrapper,
     Tabs,
     TabsItem,
@@ -16,6 +17,7 @@ import { Swap } from '../../Components/Swap';
 import { AddLiquidity } from '../../Components/AddLiquidity';
 import { Liquidity } from '../../Components/Liquidity';
 import { useConfig } from '../../Hooks/useConfig';
+import { EarnAdCard } from '../../Components/EarnAdCard';
 
 export const Overview = () => {
     const { getBalance } = useBalances();
@@ -31,7 +33,10 @@ export const Overview = () => {
             case 0:
                 return () => (
                     <SwapWrapper>
-                        <Swap />
+                        <SwapBox>
+                            <Swap />
+                        </SwapBox>
+                        <EarnAdCard />
                     </SwapWrapper>
                 );
             case 1:
