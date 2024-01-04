@@ -57,7 +57,7 @@ export const Sidebar = () => {
                     <VscRocket />
                     <span>Earn</span>
                 </SidebarItem>
-                <SidebarItem onClick={() => window.open('https://opbnbscan.com/', '_blank')}>
+                <SidebarItem onClick={() => window.open('https://testnet.opbnbscan.com/', '_blank')}>
                     <VscMap />
                     <span>Explorer</span>
                 </SidebarItem>

@@ -79,11 +79,13 @@ export const useLiquidity = () => {
                 ? parseFormattedBalance(amount0Min, token0Metadata.decimals)
                 : BN(amount0DesiredFormatted)
                       .minus(BN(amount0DesiredFormatted).multipliedBy(BN(0.01)))
+                      .dp(0)
                       .toFixed(); // Default 0.01% slippage
             const token1Min = amount1Min
                 ? parseFormattedBalance(amount1Min, token1Metadata.decimals)
                 : BN(amount1DesiredFormatted)
                       .minus(BN(amount1DesiredFormatted).multipliedBy(BN(0.01)))
+                      .dp(0)
                       .toFixed(); // Default 0.01% slippage
 
             const reducedDeadline = deadline ?? Math.floor(Date.now() / 1000) + 60; // 1 minute from the current Unix time in Seconds

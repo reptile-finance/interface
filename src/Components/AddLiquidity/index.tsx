@@ -89,7 +89,7 @@ export const AddLiquidity = () => {
                         token1: token1.address,
                         amount0Desired: value[0],
                         amount1Desired: value[1],
-                    }).then((hash) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
+                    }).then(({ hash }) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
                     break;
             }
         } catch (e) {
