@@ -4,7 +4,7 @@ import { UniswapConfig } from '../../../Config';
 import { getAllPaths } from './Routing';
 import { Address, zeroAddress } from 'viem';
 import UniswapV2Router02ABI from '../../../ABI/UniswapV2Router02';
-import { Chain, WalletClient } from 'wagmi';
+import { Chain, WalletClient, erc20ABI } from 'wagmi';
 import { readContract, writeContract, prepareWriteContract } from '@wagmi/core';
 import { WriteContractResult } from 'wagmi/actions';
 
@@ -133,6 +133,16 @@ export class Router02 extends EventEmitter<Events> {
                 throw new Error('Invalid swap method');
         }
         await swapPromise;
+    }
+
+    async approve() {
+        return prepareWriteContract({
+            address: this.token0,
+            abi: erc20ABI,
+            functionName: 'approve',
+            args: [this.uniswapConfig.router, BigInt(this.value0)],
+            chainId: Number(this.config.id),
+        }).then((prepared) => writeContract(prepared.request));
     }
 
     setPools(pools: Pool[]) {

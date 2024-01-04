@@ -6,7 +6,8 @@ import { useCallback } from 'react';
 import { useSwap } from './useSwap';
 
 export const Swap = () => {
-    const { values, setLastInputValue, setToken0, setToken1, loading, path, swap } = useSwap();
+    const { approve, values, setLastInputValue, setToken0, setToken1, loading, path, swap, isEnoughAllowance } =
+        useSwap();
 
     const onChangeInput = useCallback(
         (index: 0 | 1) => (v: string) => {
@@ -36,7 +37,11 @@ export const Swap = () => {
             />
             <SwapDetail path={path} />
             <SwapActionButtonWrapper>
-                <SwapActionButton onClick={swap}>Swap</SwapActionButton>
+                {isEnoughAllowance ? (
+                    <SwapActionButton onClick={swap}>Swap</SwapActionButton>
+                ) : (
+                    <SwapActionButton onClick={approve}>Approve</SwapActionButton>
+                )}
             </SwapActionButtonWrapper>
         </SwapWrapper>
     );

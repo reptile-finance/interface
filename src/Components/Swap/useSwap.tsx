@@ -5,7 +5,8 @@ import router02, { Pool, Router02 } from './Uniswap/Router02';
 import { useConfig } from '../../Hooks/useConfig';
 import { useUniswap } from '../../Hooks/useUniswap';
 import { usePools } from '../../Hooks/usePools';
-import { useAccount } from 'wagmi';
+import { erc20ABI, useAccount, useContractRead } from 'wagmi';
+import { zeroAddress } from 'viem';
 
 export const useSwap = () => {
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
@@ -23,6 +24,16 @@ export const useSwap = () => {
     });
     const [path, setPath] = useState<EthAddress[]>([]);
     const { address } = useAccount();
+
+    const { data: allowance } = useContractRead({
+        address: token0?.address,
+        args: [address ?? zeroAddress, uniswapConfig.router],
+        chainId: activeChainConfig.id,
+        abi: erc20ABI,
+        functionName: 'allowance',
+        watch: true,
+        enabled: token0?.address !== undefined && address !== undefined && token0.address !== zeroAddress,
+    });
 
     const setLastInputValue = useCallback(
         (input: typeof lastInput) => (v: string) => {
@@ -120,20 +131,36 @@ export const useSwap = () => {
 
     const isLoading = useMemo(() => loading.requestOnFlight > loading.requestCompleted, [loading]);
 
+    const isEnoughAllowance = useMemo(() => {
+        if (token0 && token0.address === zeroAddress) return true;
+        return token0 && allowance >= BigInt(router02.value0);
+    }, [allowance, token0]);
+
     const swap = useCallback(async () => {
+        if (!token0 || !token1 || !address) return;
+        if (!isEnoughAllowance) {
+            return;
+        }
         return router02.swap(lastInput, address);
-    }, [address, lastInput]);
+    }, [address, isEnoughAllowance, lastInput, token0, token1]);
+
+    const approve = useCallback(async () => {
+        if (!token0 || !address) return;
+        return router02.approve();
+    }, [address, token0]);
 
     return {
-        values,
         setValues,
         setLastInputValue,
-        token0,
         setToken0,
-        token1,
+        swap,
         setToken1,
+        approve,
+        isEnoughAllowance,
+        values,
+        token1,
+        token0,
         loading: isLoading,
         path,
-        swap,
     };
 };
