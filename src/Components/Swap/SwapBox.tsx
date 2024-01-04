@@ -24,7 +24,7 @@ export const SwapBox: React.FC<{
 
     const balance = useMemo(() => {
         if (!token) return '0';
-        return formatBalance(getBalance(token), 4, data?.decimals ?? 18);
+        return formatBalance(getBalance(token), data?.decimals ?? 18, 4);
     }, [data, getBalance, token]);
 
     useEffect(() => {

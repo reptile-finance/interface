@@ -5,6 +5,7 @@ import router02, { Pool, Router02 } from './Uniswap/Router02';
 import { useConfig } from '../../Hooks/useConfig';
 import { useUniswap } from '../../Hooks/useUniswap';
 import { usePools } from '../../Hooks/usePools';
+import { useAccount } from 'wagmi';
 
 export const useSwap = () => {
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
@@ -21,6 +22,7 @@ export const useSwap = () => {
         requestCompleted: 0,
     });
     const [path, setPath] = useState<EthAddress[]>([]);
+    const { address } = useAccount();
 
     const setLastInputValue = useCallback(
         (input: typeof lastInput) => (v: string) => {
@@ -43,7 +45,7 @@ export const useSwap = () => {
                 router02.setValue1(factorizedValue);
             }
         },
-        [],
+        [token0?.decimals, token1?.decimals],
     );
 
     useEffect(() => {
@@ -118,6 +120,10 @@ export const useSwap = () => {
 
     const isLoading = useMemo(() => loading.requestOnFlight > loading.requestCompleted, [loading]);
 
+    const swap = useCallback(async () => {
+        return router02.swap(lastInput, address);
+    }, [address, lastInput]);
+
     return {
         values,
         setValues,
@@ -128,5 +134,6 @@ export const useSwap = () => {
         setToken1,
         loading: isLoading,
         path,
+        swap,
     };
 };

@@ -2,10 +2,11 @@ import EventEmitter from 'eventemitter3';
 import { EthAddress } from '../../../Types';
 import { UniswapConfig } from '../../../Config';
 import { getAllPaths } from './Routing';
-import { zeroAddress } from 'viem';
+import { Address, zeroAddress } from 'viem';
 import UniswapV2Router02ABI from '../../../ABI/UniswapV2Router02';
-import { Chain } from 'wagmi';
-import { readContract } from '@wagmi/core';
+import { Chain, WalletClient } from 'wagmi';
+import { readContract, writeContract, prepareWriteContract } from '@wagmi/core';
+import { WriteContractResult } from 'wagmi/actions';
 
 type Events = 'loading' | 'amountsOutReq' | 'amountsOut' | 'amountsInReq' | 'amountsIn';
 
@@ -36,7 +37,103 @@ export class Router02 extends EventEmitter<Events> {
         this.attachEvents();
     }
 
-    swap(lastInput: 0 | 1) {}
+    async swap(lastInput: 0 | 1, toAddress: Address) {
+        let method = lastInput === 0 ? 'swapExactTokensForTokens' : 'swapTokensForExactTokens';
+        if (this.token0 === zeroAddress) {
+            method = lastInput === 0 ? 'swapExactETHForTokens' : 'swapETHForExactTokens';
+        } else if (this.token1 === zeroAddress) {
+            method = lastInput === 0 ? 'swapExactTokensForETH' : 'swapTokensForExactETH';
+        }
+        const sortestPath = this.findSortestPath();
+
+        let swapPromise: Promise<WriteContractResult>;
+
+        switch (method) {
+            case 'swapExactETHForTokens':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [BigInt(this.value0), sortestPath, toAddress, BigInt(Date.now() + 1000 * 60 * 10)],
+                    value: BigInt(this.value0),
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            case 'swapETHForExactTokens':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [BigInt(this.value1), sortestPath, toAddress, BigInt(Date.now() + 1000 * 60 * 10)],
+                    value: BigInt(this.value0),
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            case 'swapExactTokensForETH':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [
+                        BigInt(this.value0),
+                        BigInt(this.value1),
+                        sortestPath,
+                        toAddress,
+                        BigInt(Date.now() + 1000 * 60 * 10),
+                    ],
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            case 'swapTokensForExactETH':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [
+                        BigInt(this.value1),
+                        BigInt(this.value0),
+                        sortestPath,
+                        toAddress,
+                        BigInt(Date.now() + 1000 * 60 * 10),
+                    ],
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            case 'swapExactTokensForTokens':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [
+                        BigInt(this.value0),
+                        BigInt(this.value1),
+                        sortestPath,
+                        toAddress,
+                        BigInt(Date.now() + 1000 * 60 * 10),
+                    ],
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            case 'swapTokensForExactTokens':
+                swapPromise = prepareWriteContract({
+                    address: this.uniswapConfig.router,
+                    abi: UniswapV2Router02ABI,
+                    functionName: method,
+                    args: [
+                        BigInt(this.value1),
+                        BigInt(this.value0),
+                        sortestPath,
+                        toAddress,
+                        BigInt(Date.now() + 1000 * 60 * 10),
+                    ],
+                    chainId: Number(this.config.id),
+                }).then((prepared) => writeContract(prepared.request));
+                break;
+            default:
+                throw new Error('Invalid swap method');
+        }
+        await swapPromise;
+    }
 
     setPools(pools: Pool[]) {
         this.pools = pools;
@@ -108,7 +205,7 @@ export class Router02 extends EventEmitter<Events> {
             address: this.uniswapConfig.router,
             abi: UniswapV2Router02ABI,
             functionName: 'getAmountsOut',
-            args: [this.value0, path],
+            args: [BigInt(this.value0), path],
             chainId: Number(this.config.id),
         })) as bigint[];
         return data.map((value) => value.toString());
@@ -120,7 +217,7 @@ export class Router02 extends EventEmitter<Events> {
             address: this.uniswapConfig.router,
             abi: UniswapV2Router02ABI,
             functionName: 'getAmountsIn',
-            args: [this.value1, path],
+            args: [BigInt(this.value1), path],
             chainId: Number(this.config.id),
         })) as bigint[];
         return data.map((value) => value.toString());

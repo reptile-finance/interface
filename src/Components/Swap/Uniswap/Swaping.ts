@@ -1,9 +1,8 @@
-import { Chain, WalletClient, prepareRequest } from 'viem';
+import { Chain, WalletClient } from 'viem';
 import UniswapV2Router02 from '../../../ABI/UniswapV2Router02';
 import { UniswapConfig } from '../../../Config';
 import { EthAddress } from '../../../Types';
-import { writeContract } from 'viem/contract';
-import { prepareWriteContract } from 'wagmi/actions';
+import { prepareWriteContract, writeContract } from 'wagmi/actions';
 
 export const swapExactTokensForTokens = async (
     walletClient: WalletClient,
@@ -22,7 +21,7 @@ export const swapExactTokensForTokens = async (
         chainId: Number(config.id),
         walletClient,
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 export const swapExactETHForTokens = async (
@@ -43,7 +42,7 @@ export const swapExactETHForTokens = async (
         walletClient,
         chainId: Number(config.id),
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 export const swapExactTokensForETH = async (
@@ -63,7 +62,7 @@ export const swapExactTokensForETH = async (
         chainId: Number(config.id),
         walletClient,
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 export const swapETHForExactTokens = async (
@@ -83,7 +82,7 @@ export const swapETHForExactTokens = async (
         value: BigInt(amountOut),
         walletClient,
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 export const swapTokensForExactETH = async (
@@ -103,7 +102,7 @@ export const swapTokensForExactETH = async (
         chainId: Number(config.id),
         walletClient,
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 export const swapTokensForExactTokens = async (
@@ -123,7 +122,7 @@ export const swapTokensForExactTokens = async (
         chainId: Number(config.id),
         walletClient,
     });
-    return writeContract(walletClient, request);
+    return writeContract(request);
 };
 
 function generateDeadline(minutes = 1) {

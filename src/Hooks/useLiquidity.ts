@@ -6,8 +6,7 @@ import { zeroAddress } from 'viem';
 import UniswapV2Router02ABI from '../ABI/UniswapV2Router02';
 import { useTokens } from './useTokens';
 import { BN, parseFormattedBalance } from '../Utils/Bignumber';
-import { prepareWriteContract } from 'wagmi/actions';
-import { writeContract } from 'viem/contract';
+import { prepareWriteContract, writeContract } from 'wagmi/actions';
 import { useUniswap } from './useUniswap';
 
 export const useLiquidity = () => {
@@ -47,7 +46,7 @@ export const useLiquidity = () => {
                 chain: activeChainConfig,
                 walletClient: wallet,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [activeChainConfig, uniswapConfig.router, wallet],
     );
@@ -120,7 +119,7 @@ export const useLiquidity = () => {
                 ],
                 chain: activeChainConfig,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [addLiquidityETH, getTokenMetadata, activeChainConfig, uniswapConfig.router, wallet],
     );
