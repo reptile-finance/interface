@@ -38,8 +38,8 @@ export const Farms = () => {
                         <span>Farm</span>
                         <span>Earned</span>
                         <span>Daily rewards</span>
-                        <span>Available</span>
-                        <span>Staked</span>
+                        <span>Your Stake</span>
+                        <span>Total Staked</span>
                         <span></span>
                     </FarmsTableRowHeader>
 
