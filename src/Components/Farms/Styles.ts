@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 export const FarmsWrapper = styled.div`
     border-radius: ${(props) => props.theme.borderRadius};
@@ -30,7 +30,7 @@ export const FarmsTable = styled.div`
 `;
 
 export const FarmsTableRow = styled.div`
-    grid-template-columns: 2fr 1fr 1fr 2fr 1fr 1fr 2fr;
+    grid-template-columns: 2fr 1fr 1fr 2fr 1fr 2fr;
     border-bottom: 1px solid ${(props) => props.theme.borderColor};
     padding: 0.5rem 1rem;
     display: grid;

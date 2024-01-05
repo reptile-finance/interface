@@ -1,4 +1,8 @@
-    import { Button } from "../Button";
+import { useChainId } from "wagmi";
+import { Config } from "../../Config";
+import { useFarmController } from "../../Hooks/useFarmController";
+import { useFarms } from "../../Hooks/useFarms";
+import { Button } from "../Button";
 import {
     FarmsContent,
     FarmsTitle,
@@ -10,9 +14,18 @@ import {
     FarmsLogosWrapper,
     FarmsActionsWrapper
 } from "./Styles";
+import { formatEther } from "viem";
+import { useFarmsStake } from "../../Hooks/useFarmsStake";
 
 
 export const Farms = () => {
+    const chainId = useChainId();
+    const config = Config[chainId]
+
+    const { result: farms } = useFarms();
+    const { result: farmControllerData } = useFarmController()
+    const { result: farmsStake } = useFarmsStake()
+
     return (
         <FarmsWrapper>
             <FarmsTitle>
@@ -24,69 +37,36 @@ export const Farms = () => {
                     <FarmsTableRowHeader>
                         <span>Farm</span>
                         <span>Earned</span>
-                        <span>APR</span>
-                        <span>Staked Liquidity</span>
+                        <span>Daily rewards</span>
                         <span>Available</span>
                         <span>Staked</span>
                         <span></span>
                     </FarmsTableRowHeader>
 
-                    <FarmsTableRow>
-                        <FarmsNameWrapper>
-                            <FarmsLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </FarmsLogosWrapper>
-                            <span className="name">BNB-USDT LP</span>
-                        </FarmsNameWrapper>
-                        <span>3  RPTL</span>
-                        <span>27.11%</span>
-                        <span>$8,866,240</span>
-                        <span>100 LP</span>
-                        <span>2000 LP</span>
-                        <FarmsActionsWrapper>
-                            <Button>Stake</Button>
-                            <Button>Withdraw</Button>
-                        </FarmsActionsWrapper>
-                    </FarmsTableRow>
-
-                    <FarmsTableRow>
-                        <FarmsNameWrapper>
-                            <FarmsLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </FarmsLogosWrapper>
-                        <span className="name">BNB-USDT LP</span>
-                        </FarmsNameWrapper>
-                        <span>3  RPTL</span>
-                        <span>27.11%</span>
-                        <span>$8,866,240</span>
-                        <span>100 LP</span>
-                        <span>2000 LP</span>
-                        <FarmsActionsWrapper>
-                            <Button>Stake</Button>
-                            <Button>Withdraw</Button>
-                        </FarmsActionsWrapper>
-                    </FarmsTableRow>
-
-                    <FarmsTableRow>
-                        <FarmsNameWrapper>
-                            <FarmsLogosWrapper>
-                                <img src="/custom-token.png" alt="BNB" />
-                                <img src="/custom-token.png" alt="USDT" />
-                            </FarmsLogosWrapper>
-                            <span className="name">BNB-USDT LP</span>
-                        </FarmsNameWrapper>
-                        <span>3  RPTL</span>
-                        <span>27.11%</span>
-                        <span>$8,866,240</span>
-                        <span>100 LP</span>
-                        <span>2000 LP</span>
-                        <FarmsActionsWrapper>
-                            <Button>Stake</Button>
-                            <Button>Withdraw</Button>
-                        </FarmsActionsWrapper>
-                    </FarmsTableRow>
+                    {farms && farmControllerData && farmsStake && farms.map((farm, i: number) => {
+                        const DAY_IN_SECONDS = 3600n * 24n;
+                        const rewardPerDay = (farmControllerData.totalRewardPerBlock * farm.allocPoint * DAY_IN_SECONDS) / (config.secondsPerBlock * farmControllerData.totalAllocatedPoints);
+                        const userStake = farmsStake[i].amount;
+                        const earnedAmount = farm.accCakePerShare * userStake;
+                        const totalStake = farm.totalStake;
+                        return <FarmsTableRow>
+                            <FarmsNameWrapper>
+                                <FarmsLogosWrapper>
+                                    <img src="/custom-token.png" alt="BNB" />
+                                    <img src="/custom-token.png" alt="USDT" />
+                                </FarmsLogosWrapper>
+                                <span className="name">{farm.lpTokenSymbol}</span>
+                            </FarmsNameWrapper>
+                            <span>{formatEther(earnedAmount)} RPTL</span>
+                            <span>{formatEther(rewardPerDay)} RPTL</span>
+                            <span>{formatEther(userStake)} LP</span>
+                            <span>{formatEther(totalStake)} LP</span>
+                            <FarmsActionsWrapper>
+                                <Button>Stake</Button>
+                                <Button>Withdraw</Button>
+                            </FarmsActionsWrapper>
+                        </FarmsTableRow>
+                    })}
                 </FarmsTable>
             </FarmsContent>
         </FarmsWrapper>
