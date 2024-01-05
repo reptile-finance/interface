@@ -5,10 +5,9 @@ import { EthAddress, UniswapRemoveLiquidity } from '../../Types';
 import { useConfig } from '../../Hooks/useConfig';
 import { BN, parseFormattedBalance } from '../../Utils/Bignumber';
 import { useERC20 } from '../../Hooks/useERC20';
-import { prepareWriteContract, waitForTransaction } from 'wagmi/actions';
+import { prepareWriteContract, waitForTransaction, writeContract } from 'wagmi/actions';
 import { zeroAddress } from 'viem';
-import UniswapV2Router02ABI from '../../ABI/UniswapV2Router02.json';
-import { writeContract } from 'viem/contract';
+import UniswapV2Router02ABI from '../../ABI/UniswapV2Router02';
 
 export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1: EthAddress) => {
     const { address } = useAccount();
@@ -38,7 +37,7 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
     const approveLpToken = useCallback(() => {
         if (isEnoughAllowance || !poolToken || !value) return;
         const weiValue = parseFormattedBalance(value, poolToken.decimals);
-        return approve(pool, uniswapConfig.router, weiValue).then((hash) =>
+        return approve(pool, uniswapConfig.router, weiValue).then(({ hash }) =>
             waitForTransaction({
                 hash,
                 chainId: activeChainConfig.id,
@@ -56,7 +55,7 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
                 args: [token0, token1, liquidity, amount0Min, amount1Min, to, deadline],
                 chain: activeChainConfig,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [activeChainConfig, token0, token1, uniswapConfig.router, wallet],
     );
@@ -113,7 +112,7 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
                 ],
                 chain: activeChainConfig,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [
             activeChainConfig,

@@ -17,7 +17,7 @@ export const TokenRow: React.FC<{
 
     const balance = useMemo(() => {
         const bal = getBalance(address);
-        return formatBalance(bal, 4, data?.decimals ?? 18);
+        return formatBalance(bal, data?.decimals ?? 18, 4);
     }, [address, data?.decimals, getBalance]);
 
     if (isLoading || !data || isError) return null;

@@ -52,14 +52,14 @@ export const AddLiquidity = () => {
         const promises: Promise<void>[] = [];
         if (!isEnoughAllowance0) {
             const amount = parseFormattedBalance(value[0], token0.decimals);
-            const p = approve(token0.address, uniswapConfig.router, amount).then((hash) =>
+            const p = approve(token0.address, uniswapConfig.router, amount).then(({ hash }) =>
                 waitForTransaction({ hash, chainId: activeChainConfig.id }),
             );
             promises.push(p);
         }
         if (!isEnoughAllowance1) {
             const amount = parseFormattedBalance(value[1], token1.decimals);
-            const p = approve(token1.address, uniswapConfig.router, amount).then((hash) =>
+            const p = approve(token1.address, uniswapConfig.router, amount).then(({ hash }) =>
                 waitForTransaction({ hash, chainId: activeChainConfig.id }),
             );
             promises.push(p);
@@ -89,7 +89,7 @@ export const AddLiquidity = () => {
                         token1: token1.address,
                         amount0Desired: value[0],
                         amount1Desired: value[1],
-                    }).then((hash) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
+                    }).then(({ hash }) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
                     break;
             }
         } catch (e) {

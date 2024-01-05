@@ -26,7 +26,7 @@ export const AddLiquidityBox: React.FC<{
 
     const balance = useMemo(() => {
         if (!token) return '0';
-        return formatBalance(getBalance(token), 4, data?.decimals ?? 18);
+        return formatBalance(getBalance(token), data?.decimals ?? 18);
     }, [data, getBalance, token]);
 
     const BalanceInfo = useMemo(() => {

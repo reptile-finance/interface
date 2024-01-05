@@ -1,16 +1,18 @@
 import { EthAddress } from '../Types';
 
+export type BlockchainContractsConfig = {
+    router: EthAddress;
+    factory: EthAddress;
+    uniswapQuery: EthAddress;
+    uniswapHelper: EthAddress;
+    weth: EthAddress;
+    token: EthAddress;
+    farmController: EthAddress;
+    secondsPerBlock: bigint;
+};
+
 export const Config: {
-    [chainId: string]: {
-        router: EthAddress;
-        factory: EthAddress;
-        uniswapQuery: EthAddress;
-        uniswapHelper: EthAddress;
-        weth: EthAddress;
-        token: EthAddress;
-        farmController: EthAddress;
-        secondsPerBlock: bigint;
-    };
+    [chainId: string]: BlockchainContractsConfig;
 } = {
     '5611': {
         // opBNB testnet

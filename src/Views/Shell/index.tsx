@@ -20,7 +20,7 @@ export const Shell = () => {
     }, [location.pathname]);
 
     const balance = useMemo(() => {
-        return formatBalance(getBalance(zeroAddress), 4, activeChainConfig?.nativeCurrency.decimals);
+        return formatBalance(getBalance(zeroAddress), activeChainConfig?.nativeCurrency.decimals, 4);
     }, [activeChainConfig, getBalance]);
 
     return (
