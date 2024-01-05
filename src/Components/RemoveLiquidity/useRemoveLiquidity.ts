@@ -37,7 +37,7 @@ export const useRemoveLiquidity = (pool: EthAddress, token0: EthAddress, token1:
     const approveLpToken = useCallback(() => {
         if (isEnoughAllowance || !poolToken || !value) return;
         const weiValue = parseFormattedBalance(value, poolToken.decimals);
-        return approve(pool, uniswapConfig.router, weiValue).then((hash) =>
+        return approve(pool, uniswapConfig.router, weiValue).then(({ hash }) =>
             waitForTransaction({
                 hash,
                 chainId: activeChainConfig.id,

@@ -88,7 +88,7 @@ export const RemoveLiquidity: React.FC<{
                         amount0Min: token0Return,
                         amount1Min: token1Return,
                         liquidity: value,
-                    }).then((hash) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
+                    }).then(({ hash }) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
                     break;
             }
         } catch (e) {
