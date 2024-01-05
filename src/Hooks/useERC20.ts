@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { EthAddress } from '../Types';
 import { erc20ABI, useWalletClient } from 'wagmi';
-import { prepareWriteContract } from 'wagmi/actions';
+import { prepareWriteContract, writeContract } from 'wagmi/actions';
 import { useConfig } from './useConfig';
 
 export const useERC20 = () => {
@@ -21,7 +21,7 @@ export const useERC20 = () => {
                 chain: activeChainConfig.id,
                 walletClient: wallet,
             });
-            return wallet.writeContract(request);
+            return writeContract(request);
         },
         [activeChainConfig.id, wallet],
     );
@@ -39,7 +39,7 @@ export const useERC20 = () => {
                 chain: activeChainConfig.id,
                 walletClient: wallet,
             });
-            return wallet.writeContract(request);
+            return writeContract(request);
         },
         [activeChainConfig.id, wallet],
     );
