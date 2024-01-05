@@ -3,11 +3,10 @@ import { useConfig } from './useConfig';
 import { useWalletClient } from 'wagmi';
 import { UniswapAddLiquidity } from '../Types';
 import { zeroAddress } from 'viem';
-import UniswapV2Router02ABI from '../ABI/UniswapV2Router02.json';
+import UniswapV2Router02ABI from '../ABI/UniswapV2Router02';
 import { useTokens } from './useTokens';
 import { BN, parseFormattedBalance } from '../Utils/Bignumber';
-import { prepareWriteContract } from 'wagmi/actions';
-import { writeContract } from 'viem/contract';
+import { prepareWriteContract, writeContract } from 'wagmi/actions';
 import { useUniswap } from './useUniswap';
 
 export const useLiquidity = () => {
@@ -47,7 +46,7 @@ export const useLiquidity = () => {
                 chain: activeChainConfig,
                 walletClient: wallet,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [activeChainConfig, uniswapConfig.router, wallet],
     );
@@ -80,11 +79,13 @@ export const useLiquidity = () => {
                 ? parseFormattedBalance(amount0Min, token0Metadata.decimals)
                 : BN(amount0DesiredFormatted)
                       .minus(BN(amount0DesiredFormatted).multipliedBy(BN(0.01)))
+                      .dp(0)
                       .toFixed(); // Default 0.01% slippage
             const token1Min = amount1Min
                 ? parseFormattedBalance(amount1Min, token1Metadata.decimals)
                 : BN(amount1DesiredFormatted)
                       .minus(BN(amount1DesiredFormatted).multipliedBy(BN(0.01)))
+                      .dp(0)
                       .toFixed(); // Default 0.01% slippage
 
             const reducedDeadline = deadline ?? Math.floor(Date.now() / 1000) + 60; // 1 minute from the current Unix time in Seconds
@@ -120,7 +121,7 @@ export const useLiquidity = () => {
                 ],
                 chain: activeChainConfig,
             });
-            return writeContract(wallet, request);
+            return writeContract(request);
         },
         [addLiquidityETH, getTokenMetadata, activeChainConfig, uniswapConfig.router, wallet],
     );

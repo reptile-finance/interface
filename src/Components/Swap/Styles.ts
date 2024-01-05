@@ -1,5 +1,14 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 import { Button } from '../Button';
+
+const spinAnimation = keyframes`
+    from {  
+        transform:rotate(0deg);
+    }
+    to {
+        transform:rotate(360deg);
+    }
+`;
 
 export const SwapWrapper = styled.div`
     border-radius: ${(props) => props.theme.borderRadius};
@@ -80,6 +89,7 @@ export const SwapInputNumber = styled.div`
     align-items: center;
     background: ${(props) => props.theme.background3};
     transition: border 0.2s ease-in-out;
+    position: relative;
 
     > input {
         background: transparent;
@@ -96,6 +106,22 @@ export const SwapInputNumber = styled.div`
     &:hover,
     &:focus-within {
         border: 1px solid ${(props) => props.theme.accentColor};
+    }
+
+    span.loading {
+        position: absolute;
+        right: 0;
+        height: 100%;
+        padding: 0 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-left: 1px solid ${(props) => props.theme.borderColor};
+
+        > svg {
+            color: ${(props) => props.theme.accentColor};
+            animation: ${spinAnimation} 0.5s linear infinite;
+        }
     }
 `;
 

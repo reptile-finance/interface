@@ -23,7 +23,7 @@ export const Overview = () => {
     const [activeTab, setActiveTab] = useState(0);
 
     const userBalance = useMemo(() => {
-        return formatBalance(getBalance(zeroAddress), 4, activeChainConfig.nativeCurrency.decimals);
+        return formatBalance(getBalance(zeroAddress), activeChainConfig.nativeCurrency.decimals, 4);
     }, [activeChainConfig.nativeCurrency.decimals, getBalance]);
 
     const Tab = useMemo(() => {
