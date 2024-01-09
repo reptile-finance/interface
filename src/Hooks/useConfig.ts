@@ -44,5 +44,5 @@ export const useConfig = () => {
         return { ...config.appConfig[config.chainId], id: config.chainId };
     }, [config]);
 
-    return { config: appConfig, activeChainConfig, getTokens, updateAppConfig };
+    return { config: appConfig, activeChainConfig, userConfig: config.user, getTokens, updateAppConfig };
 };

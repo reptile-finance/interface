@@ -5,13 +5,13 @@ import { UniswapAddLiquidity } from '../Types';
 import { zeroAddress } from 'viem';
 import UniswapV2Router02ABI from '../ABI/UniswapV2Router02';
 import { useTokens } from './useTokens';
-import { BN, parseFormattedBalance } from '../Utils/Bignumber';
+import { BN, parseFormattedBalance, substractPercentage } from '../Utils/Bignumber';
 import { prepareWriteContract, writeContract } from 'wagmi/actions';
 import { useUniswap } from './useUniswap';
 
 export const useLiquidity = () => {
     const { data: wallet } = useWalletClient();
-    const { activeChainConfig } = useConfig();
+    const { activeChainConfig, userConfig } = useConfig();
     const { getTokenMetadata } = useTokens();
     const { uniswapConfig } = useUniswap();
 
@@ -77,16 +77,14 @@ export const useLiquidity = () => {
             const amount1DesiredFormatted = parseFormattedBalance(amount1Desired, token1Metadata.decimals);
             const token0Min = amount0Min
                 ? parseFormattedBalance(amount0Min, token0Metadata.decimals)
-                : BN(amount0DesiredFormatted)
-                      .minus(BN(amount0DesiredFormatted).multipliedBy(BN(0.01)))
+                : BN(substractPercentage(amount0DesiredFormatted, userConfig?.slippage ?? '0.5'))
                       .dp(0)
-                      .toFixed(); // Default 0.01% slippage
+                      .toFixed();
             const token1Min = amount1Min
                 ? parseFormattedBalance(amount1Min, token1Metadata.decimals)
-                : BN(amount1DesiredFormatted)
-                      .minus(BN(amount1DesiredFormatted).multipliedBy(BN(0.01)))
+                : BN(substractPercentage(amount1DesiredFormatted, userConfig?.slippage ?? '0.5'))
                       .dp(0)
-                      .toFixed(); // Default 0.01% slippage
+                      .toFixed();
 
             const reducedDeadline = deadline ?? Math.floor(Date.now() / 1000) + 60; // 1 minute from the current Unix time in Seconds
             const reducedTo = to ?? wallet.account.address;

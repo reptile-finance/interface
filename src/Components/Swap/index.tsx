@@ -35,7 +35,7 @@ export const Swap = () => {
                 onTokenChange={setToken1}
                 loading={loading}
             />
-            <SwapDetail path={path} />
+            <SwapDetail path={path} values={values} />
             <SwapActionButtonWrapper>
                 {isEnoughAllowance ? (
                     <SwapActionButton onClick={swap}>Swap</SwapActionButton>

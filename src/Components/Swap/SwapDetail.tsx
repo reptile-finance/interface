@@ -4,12 +4,16 @@ import { SwapDetailContent, SwapDetailRow, SwapDetailWrapper } from './Styles';
 import { fetchToken } from 'wagmi/actions';
 import { usePriceImpact } from '../../Hooks/usePriceImpact';
 import { useToken } from '../../Hooks/useToken';
+import { substractPercentage } from '../../Utils/Bignumber';
+import { useConfig } from '../../Hooks/useConfig';
 
 export const SwapDetail: React.FC<{
     path: EthAddress[];
-}> = ({ path }) => {
+    values: string[];
+}> = ({ path, values }) => {
     const [tokenSymbols, setTokenSymbols] = useState<string[] | undefined>(undefined);
     const { priceImpact } = usePriceImpact();
+    const { userConfig } = useConfig();
 
     const tokenOut = useMemo(() => {
         if (!path) return undefined;
@@ -28,12 +32,19 @@ export const SwapDetail: React.FC<{
         ).then(setTokenSymbols);
     }, [path]);
 
+    const minimumReceived = useMemo(() => {
+        if (!values[1]) return undefined;
+        return substractPercentage(values[1], userConfig?.slippage ?? 0.5);
+    }, [userConfig, values]);
+
     return (
         <SwapDetailWrapper>
             <SwapDetailContent>
                 <SwapDetailRow>
                     <span>Minimum Received</span>
-                    <span>12 {tokenData?.symbol}</span>
+                    <span>
+                        {minimumReceived} {tokenData?.symbol}
+                    </span>
                 </SwapDetailRow>
                 <SwapDetailRow>
                     <span>Price Impact</span>

@@ -45,3 +45,7 @@ export const formatBalance = (balance: number | string, tokenDecimals: string | 
 export const parseFormattedBalance = (balance: number | string, decimals: string | number = 18) => {
     return BigNumber(balance).times(BigNumber(10).pow(decimals)).dp(0).toFixed();
 };
+
+export const substractPercentage = (num: string | number, percentage: string | number) => {
+    return BigNumber(num).minus(BigNumber(num).times(percentage).dividedBy(100)).toFixed();
+};
