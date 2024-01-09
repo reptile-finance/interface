@@ -3,8 +3,10 @@ import { Input } from "../Input"
 import { FC, PropsWithoutRef, useMemo, useState } from "react"
 import { Button } from "../Button"
 import { useFarmController } from "../../Hooks/useFarmController"
-import { parseEther } from "viem"
+import { formatEther, parseEther } from "viem"
 import { useFarmsStake } from "../../Hooks/useFarmsStake"
+import { erc20ABI, useContractRead, useWalletClient } from "wagmi"
+import { useFarms } from "../../Hooks/useFarms"
 
 export const FarmUnstake: FC<PropsWithoutRef<{
     lpIndex: number;
@@ -26,7 +28,7 @@ export const FarmUnstake: FC<PropsWithoutRef<{
     return <FarmStakeWrapper>
         <h1>Unstake</h1>
         <p>Withdraw your LP tokens</p>
-        <Input title="Amount" value={amount} onChange={(v) => setAmount(v.target.value)} />
+        <Input title={`Withdrawable balance: ${userFarmStake ? formatEther(userFarmStake) : "Loading..."}`} value={amount} onChange={(v) => setAmount(v.target.value)} />
         {ButtonAction}
     </FarmStakeWrapper>
 }
