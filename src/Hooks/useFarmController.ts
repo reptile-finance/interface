@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AsyncResult, initialAsyncResultValue } from '../Utils/AsyncResult';
-import { useChainId, usePublicClient } from 'wagmi';
+import { useChainId, usePublicClient, useWalletClient } from 'wagmi';
 import FarmControllerAbi from '../ABI/FarmController.json';
-import { readContract } from 'viem/contract';
+import { readContract, writeContract } from 'viem/contract';
 import { Config } from '../Config';
 
 interface FarmControllerData {
@@ -14,6 +14,7 @@ export const useFarmController = () => {
     const [result, setResult] = useState<AsyncResult<FarmControllerData>>(initialAsyncResultValue);
     const chainId = useChainId();
     const publicClient = usePublicClient();
+    const walletClient = useWalletClient();
 
     const config = Config[chainId];
 
@@ -33,6 +34,36 @@ export const useFarmController = () => {
         return { totalAllocatedPoints, totalRewardPerBlock } as FarmControllerData;
     }, [config.farmController, publicClient]);
 
+    const stake = useCallback(
+        async (farmIndex: number, amount: bigint) => {
+            const tx = writeContract(walletClient.data, {
+                functionName: 'deposit',
+                abi: FarmControllerAbi,
+                address: config.farmController,
+                chain: null,
+                args: [farmIndex, amount],
+            });
+
+            return tx;
+        },
+        [config.farmController, walletClient.data],
+    );
+
+    const unstake = useCallback(
+        async (farmIndex: number, amount: bigint) => {
+            const tx = writeContract(walletClient.data, {
+                functionName: 'withdraw',
+                abi: FarmControllerAbi,
+                address: config.farmController,
+                chain: null,
+                args: [farmIndex, amount],
+            });
+
+            return tx;
+        },
+        [config.farmController, walletClient.data],
+    );
+
     useEffect(() => {
         setResult(initialAsyncResultValue);
         fetchFarmControllerData()
@@ -43,5 +74,5 @@ export const useFarmController = () => {
             });
     }, [fetchFarmControllerData, setResult]);
 
-    return result;
+    return { data: result, stake, unstake, address: config.farmController };
 };

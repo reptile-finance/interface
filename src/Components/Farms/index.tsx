@@ -16,18 +16,22 @@ import {
 } from "./Styles";
 import { formatEther } from "viem";
 import { useFarmsStake } from "../../Hooks/useFarmsStake";
+import { FarmInteractionModal, TFarmInteractionModalType } from "./FarmInteractionModal";
+import { useState } from "react";
 
 
 export const Farms = () => {
+    const [typeFarmInteraction, setTypeFarmInteraction] = useState<{ type: TFarmInteractionModalType | null, farmIndex?: number }>({ type: null })
     const chainId = useChainId();
     const config = Config[chainId]
 
     const { result: farms } = useFarms();
-    const { result: farmControllerData } = useFarmController()
+    const { data: { result: farmControllerData } } = useFarmController()
     const { result: farmsStake } = useFarmsStake()
 
     return (
         <FarmsWrapper>
+            <FarmInteractionModal type={typeFarmInteraction.type} lpIndex={typeFarmInteraction.farmIndex} onClose={() => setTypeFarmInteraction({ type: null })} />
             <FarmsTitle>
                 <div className="title">Farms</div>
                 <div>Stake your LP tokens to earn Reptiles</div>
@@ -62,14 +66,14 @@ export const Farms = () => {
                             <span>{formatEther(userStake)} LP</span>
                             <span>{formatEther(totalStake)} LP</span>
                             <FarmsActionsWrapper>
-                                <Button>Stake</Button>
-                                <Button>Withdraw</Button>
+                                <Button onClick={() => setTypeFarmInteraction({ type: 'stake', farmIndex: i })}>Stake</Button>
+                                <Button onClick={() => setTypeFarmInteraction({ type: 'unstake', farmIndex: i })}>Withdraw</Button>
                             </FarmsActionsWrapper>
                         </FarmsTableRow>
                     })}
                 </FarmsTable>
             </FarmsContent>
-        </FarmsWrapper>
+        </FarmsWrapper >
 
     );
 };
