@@ -12,7 +12,6 @@ export const useSwap = () => {
     const [token0, setToken0] = useState<TokenMetadata | undefined>(undefined);
     const [token1, setToken1] = useState<TokenMetadata | undefined>(undefined);
     const [values, setValues] = useState<string[]>(['0', '0']);
-    const [priceImpact, setPriceImpact] = useState<string>('0');
     const [lastReqId, setReqId] = useState(router02.reqId);
     const { activeChainConfig } = useConfig();
     const { uniswapConfig } = useUniswap();
@@ -126,7 +125,7 @@ export const useSwap = () => {
 
     useEffect(() => {
         const path = router02.findSortestPath();
-        setPath(path);
+        setPath(path?.path);
     }, [token0, token1]);
 
     const isLoading = useMemo(() => loading.requestOnFlight > loading.requestCompleted, [loading]);

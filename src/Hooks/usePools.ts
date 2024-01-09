@@ -32,6 +32,20 @@ export const usePools = () => {
         }) as Promise<[EthAddress, EthAddress, EthAddress][]>; // token0, token1, pairAddress
     }, [activeChainConfig.id, uniswapConfig]);
 
+    const getReservesByPools = useCallback(
+        async (pools: EthAddress[]) => {
+            const reserves = await readContract({
+                address: uniswapConfig.uniswapQuery,
+                abi: UniswapQuery,
+                functionName: 'getReservesByPairs',
+                args: [pools],
+                chainId: Number(activeChainConfig.id),
+            });
+            return reserves as [string, string, string][];
+        },
+        [activeChainConfig.id, uniswapConfig],
+    );
+
     const getPool = useCallback(
         (token0: EthAddress, token1: EthAddress) => {
             try {
@@ -43,7 +57,7 @@ export const usePools = () => {
                     chainId: Number(activeChainConfig.id),
                 });
             } catch (error) {
-                console.error('🚀 ~ file: usePools.ts:39 ~ getPools ~ error:', error);
+                console.error(error);
                 return zeroAddress;
             }
         },
@@ -54,5 +68,5 @@ export const usePools = () => {
         return poolsState[activeChainConfig.id];
     }, [activeChainConfig, poolsState]);
 
-    return { getPools, getPool, pools };
+    return { getPools, getPool, getReservesByPools, pools };
 };

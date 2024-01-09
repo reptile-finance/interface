@@ -1,6 +1,6 @@
 import { Chain, WalletClient } from 'viem';
 import UniswapV2Router02 from '../../../ABI/UniswapV2Router02';
-import { UniswapConfig } from '../../../Config';
+import { BlockchainContractsConfig } from '../../../Config';
 import { EthAddress } from '../../../Types';
 import { prepareWriteContract, writeContract } from 'wagmi/actions';
 
@@ -10,7 +10,7 @@ export const swapExactTokensForTokens = async (
     amountOutMin: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({
@@ -30,7 +30,7 @@ export const swapExactETHForTokens = async (
     amountOutMin: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({
@@ -51,7 +51,7 @@ export const swapExactTokensForETH = async (
     amountOutMin: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({
@@ -70,7 +70,7 @@ export const swapETHForExactTokens = async (
     amountOut: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({
@@ -91,7 +91,7 @@ export const swapTokensForExactETH = async (
     amountInMax: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({
@@ -111,7 +111,7 @@ export const swapTokensForExactTokens = async (
     amountInMax: string,
     path: EthAddress[],
     to: EthAddress,
-    uniswapConfig: UniswapConfig,
+    uniswapConfig: BlockchainContractsConfig,
     config: Chain,
 ) => {
     const { request } = await prepareWriteContract({

@@ -1,12 +1,12 @@
 import EventEmitter from 'eventemitter3';
 import { EthAddress } from '../../../Types';
-import { UniswapConfig } from '../../../Config';
 import { getAllPaths } from './Routing';
 import { Address, zeroAddress } from 'viem';
 import UniswapV2Router02ABI from '../../../ABI/UniswapV2Router02';
-import { Chain, WalletClient, erc20ABI } from 'wagmi';
+import { Chain, erc20ABI } from 'wagmi';
 import { readContract, writeContract, prepareWriteContract } from '@wagmi/core';
 import { WriteContractResult } from 'wagmi/actions';
+import { BlockchainContractsConfig } from '../../../Config';
 
 type Events = 'loading' | 'amountsOutReq' | 'amountsOut' | 'amountsInReq' | 'amountsIn';
 
@@ -25,7 +25,7 @@ export class Router02 extends EventEmitter<Events> {
     public value1 = '0';
     public pools: Pool[] = [];
     public reqId = 0;
-    public uniswapConfig: undefined | UniswapConfig;
+    public uniswapConfig: undefined | BlockchainContractsConfig;
     public config: undefined | Chain;
     public requests = {
         requestOnFlight: 0,
@@ -173,7 +173,7 @@ export class Router02 extends EventEmitter<Events> {
         this.token1 = token1;
     }
 
-    setUniswapConfig(config: UniswapConfig) {
+    setUniswapConfig(config: BlockchainContractsConfig) {
         this.uniswapConfig = config;
     }
 
@@ -188,7 +188,7 @@ export class Router02 extends EventEmitter<Events> {
     public findSortestPath() {
         const paths = this.findPaths();
         const sortestPath = paths.reduce((prev, curr) => {
-            return prev.length > curr.length && curr.length > 1 ? curr : prev;
+            return prev.path.length > curr.path.length && curr.path.length > 1 ? curr : prev;
         }, paths[0]);
         return sortestPath;
     }
@@ -237,7 +237,7 @@ export class Router02 extends EventEmitter<Events> {
         this.on('amountsOutReq', ({ reqId }) => {
             this.addRequestOnFlight();
             const sortestPath = this.findSortestPath();
-            this.getAmountsOut(sortestPath)
+            this.getAmountsOut(sortestPath.path)
                 .then((amountsOut) => {
                     this.emit('amountsOut', { reqId, amountsOut });
                 })
@@ -247,7 +247,7 @@ export class Router02 extends EventEmitter<Events> {
         this.on('amountsInReq', ({ reqId }) => {
             this.addRequestOnFlight();
             const sortestPath = this.findSortestPath();
-            this.getAmountsIn(sortestPath)
+            this.getAmountsIn(sortestPath.path)
                 .then((amountsIn) => {
                     this.emit('amountsIn', { reqId, amountsIn });
                 })

@@ -5,12 +5,19 @@ import { Pool } from './Router02';
 export const getAllPaths = (tokenSource: EthAddress, tokenDestination: EthAddress, pools: Pool[]) => {
     if (!tokenSource || !tokenDestination || !pools) return [];
     const paths: EthAddress[][] = [];
+    const poolsInvolved: EthAddress[][] = [];
     const MAX_DEPTH = 5;
 
-    const computeRoute = (currentRoute: EthAddress[], depth: number, availablePools: Pool[]) => {
+    const computeRoute = (
+        currentRoute: EthAddress[],
+        poolsInv: EthAddress[],
+        depth: number,
+        availablePools: Pool[],
+    ) => {
         const previousToken = currentRoute[currentRoute.length - 1] ?? tokenSource;
         if (compareAddress(previousToken, tokenDestination)) {
             paths.push(currentRoute);
+            poolsInvolved.push(poolsInv);
             return;
         }
 
@@ -28,11 +35,17 @@ export const getAllPaths = (tokenSource: EthAddress, tokenDestination: EthAddres
             }
             const poolsCopy = [...availablePools];
             poolsCopy.splice(i, 1);
-            computeRoute([...currentRoute, tokenOut], depth + 1, poolsCopy);
+            const pInv = [...poolsInv, pools[i][2]];
+            computeRoute([...currentRoute, tokenOut], pInv, depth + 1, poolsCopy);
         }
     };
-    computeRoute([tokenSource], 0, pools);
-    return paths;
+    computeRoute([tokenSource], [], 0, pools);
+    return paths.map((path, index) => {
+        return {
+            path,
+            pools: poolsInvolved[index],
+        };
+    });
 };
 
 const compareAddress = (a: EthAddress, b: EthAddress): boolean => {

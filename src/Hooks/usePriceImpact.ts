@@ -1,29 +1,66 @@
-import { EthAddress } from '../Types';
-import { usePool } from './usePool';
-import { useRouter } from './useRouter';
+import { useCallback, useEffect, useState } from 'react';
+import router02 from '../Components/Swap/Uniswap/Router02';
+import { usePools } from './usePools';
+import { BN } from '../Utils/Bignumber';
 
 export const usePriceImpact = () => {
-    const { getAmountsOut, getAmountsIn, getPair } = useRouter();
+    const [requestId, setRequestId] = useState<number>(0);
+    const [priceImpact, setPriceImpact] = useState<string>('0');
+    const { getReservesByPools } = usePools();
 
-    // const [] = usePool
+    const calcPriceImpact = useCallback(
+        async (amountsOut: string[]) => {
+            const sortestPath = router02.findSortestPath();
+            const pathWithReserves = await getReservesByPools(sortestPath.pools);
+            const midPrice = calcMidPrice(pathWithReserves);
+            const aIn = amountsOut[0];
+            const aOut = amountsOut[amountsOut.length - 1];
 
-    // async function calculatePriceImpact(amountIn: string, path: EthAddress[]): number {
+            const result = BN(aIn)
+                .dividedBy(aOut)
+                .minus(midPrice)
+                .dividedBy(midPrice)
+                .multipliedBy(100)
+                .abs()
+                .minus(0.25) // PLATFORM FEE
+                .toFixed(2);
 
-    //     let priceImpact = 0;
-    //     let lastAmountIn = amountIn;
-    //     for (let i = 0; i < path.length - 1; i++) {
-    //         const pair = await getPair(path[i], path[i + 1]);
-    //         const amountsOut = await getAmountsOut(lastAmountIn, [path[i], path[i + 1]]);
+            if (BN(result).isGreaterThan(100)) {
+                setPriceImpact('100');
+            } else {
+                setPriceImpact(result);
+            }
+        },
+        [getReservesByPools],
+    );
 
-    //         const amountOut = amountsOut[1];
-    //         const reserveIn = pair.reserve0;
+    useEffect(() => {
+        const fn = ({ reqId, amountsOut }: { reqId: number; amountsOut: string[] }) => {
+            try {
+                if (reqId >= requestId) {
+                    calcPriceImpact(amountsOut);
+                }
+            } catch (e) {
+                console.error(e);
+                setPriceImpact('0');
+            } finally {
+                setRequestId(reqId);
+            }
+        };
+        router02.on('amountsOut', fn);
+        return () => {
+            router02.off('amountsOut', fn);
+        };
+    }, [calcPriceImpact, getReservesByPools, requestId]);
 
-    //         priceImpact += Math.abs(reserveIn) + Math.abs(amountIn);
-    //         amountIn = amountOut;
-    //     }
+    const calcMidPrice = (pathWithReserves: [string, string, string][]) => {
+        const midPrice = pathWithReserves.reduce((acc, reserve) => {
+            const [token0Reserve, token1Reserve] = reserve;
+            const price = BN(token0Reserve.toString()).div(token1Reserve.toString());
+            return BN(acc).multipliedBy(price).toString();
+        }, '1');
+        return midPrice;
+    };
 
-    //     priceImpact = priceImpact / Math.abs(amountIn);
-    //     return priceImpact.toString();
-
-    // }
+    return { priceImpact };
 };

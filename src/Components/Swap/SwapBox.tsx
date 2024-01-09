@@ -16,7 +16,6 @@ export const SwapBox: React.FC<{
 }> = ({ defaultToken, value, onChange, onTokenChange, loading }) => {
     const { getBalance } = useBalances();
     const [selectorOpen, setSelectorOpen] = useState(false);
-
     const [token, setToken] = useState<EthAddress | undefined>(defaultToken ?? undefined);
     const { data, isLoading, isError } = useToken({
         address: token,
