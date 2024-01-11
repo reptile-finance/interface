@@ -80,10 +80,19 @@ export const TabsItem = styled.div`
 `;
 
 export const SwapWrapper = styled.div`
+    width: 100%;
+    display: flex;
+    gap: 4rem;
+
+    @media (max-width: ${(props) => props.theme.breakpoints.md}) {
+        flex-direction: column;
+    }
+`;
+
+export const SwapBox = styled.div`
     width: 30rem;
 `;
 
 export const LiquidityWrapper = styled.div`
     width: 50rem;
 `;
-
