@@ -7,6 +7,7 @@ import { Chain, erc20ABI } from 'wagmi';
 import { readContract, writeContract, prepareWriteContract } from '@wagmi/core';
 import { WriteContractResult } from 'wagmi/actions';
 import { BlockchainContractsConfig } from '../../../Config';
+import { isNumber, substractPercentage } from '../../../Utils/Bignumber';
 
 type Events = 'loading' | 'amountsOutReq' | 'amountsOut' | 'amountsInReq' | 'amountsIn';
 
@@ -27,6 +28,7 @@ export class Router02 extends EventEmitter<Events> {
     public reqId = 0;
     public uniswapConfig: undefined | BlockchainContractsConfig;
     public config: undefined | Chain;
+    public slippage = '0.5';
     public requests = {
         requestOnFlight: 0,
         requestCompleted: 0,
@@ -54,7 +56,12 @@ export class Router02 extends EventEmitter<Events> {
                     address: this.uniswapConfig.router,
                     abi: UniswapV2Router02ABI,
                     functionName: method,
-                    args: [BigInt(this.value0), sortestPath, toAddress, BigInt(Date.now() + 1000 * 60 * 10)],
+                    args: [
+                        BigInt(substractPercentage(this.value0, this.slippage)),
+                        sortestPath,
+                        toAddress,
+                        BigInt(Date.now() + 1000 * 60 * 10),
+                    ],
                     value: BigInt(this.value0),
                     chainId: Number(this.config.id),
                 }).then((prepared) => writeContract(prepared.request));
@@ -76,7 +83,7 @@ export class Router02 extends EventEmitter<Events> {
                     functionName: method,
                     args: [
                         BigInt(this.value0),
-                        BigInt(this.value1),
+                        BigInt(substractPercentage(this.value1, this.slippage)),
                         sortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
@@ -91,7 +98,7 @@ export class Router02 extends EventEmitter<Events> {
                     functionName: method,
                     args: [
                         BigInt(this.value1),
-                        BigInt(this.value0),
+                        BigInt(substractPercentage(this.value0, this.slippage)),
                         sortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
@@ -106,7 +113,7 @@ export class Router02 extends EventEmitter<Events> {
                     functionName: method,
                     args: [
                         BigInt(this.value0),
-                        BigInt(this.value1),
+                        BigInt(substractPercentage(this.value1, this.slippage)),
                         sortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
@@ -175,6 +182,12 @@ export class Router02 extends EventEmitter<Events> {
 
     setUniswapConfig(config: BlockchainContractsConfig) {
         this.uniswapConfig = config;
+    }
+
+    setSlippage(slippage: string) {
+        if (isNumber(slippage)) {
+            this.slippage = slippage;
+        }
     }
 
     setConfig(config: Chain) {

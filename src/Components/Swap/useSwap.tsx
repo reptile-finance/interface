@@ -13,7 +13,7 @@ export const useSwap = () => {
     const [token1, setToken1] = useState<TokenMetadata | undefined>(undefined);
     const [values, setValues] = useState<string[]>(['0', '0']);
     const [lastReqId, setReqId] = useState(router02.reqId);
-    const { activeChainConfig } = useConfig();
+    const { activeChainConfig, userConfig } = useConfig();
     const { uniswapConfig } = useUniswap();
     const { pools } = usePools();
     const [lastInput, setLastInput] = useState<0 | 1>(0);
@@ -113,6 +113,10 @@ export const useSwap = () => {
     useEffect(() => {
         router02.setUniswapConfig(uniswapConfig);
     }, [uniswapConfig]);
+
+    useEffect(() => {
+        router02.setSlippage(userConfig.slippage);
+    }, [userConfig]);
 
     useEffect(() => {
         const normalizedPools: Pool[] = Object.keys(pools).map((poolAddr: EthAddress) => {
