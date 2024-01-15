@@ -115,7 +115,7 @@ export const useSwap = () => {
     }, [uniswapConfig]);
 
     useEffect(() => {
-        router02.setSlippage(userConfig.slippage);
+        router02.setSlippage(userConfig?.slippage ?? '0.5');
     }, [userConfig]);
 
     useEffect(() => {
