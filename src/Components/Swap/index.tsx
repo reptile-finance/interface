@@ -4,6 +4,7 @@ import { SwapBox } from './SwapBox';
 import { SwapDetail } from './SwapDetail';
 import { useCallback } from 'react';
 import { useSwap } from './useSwap';
+import toast from 'react-hot-toast';
 
 export const Swap = () => {
     const { approve, values, setLastInputValue, setToken0, setToken1, loading, path, swap, isEnoughAllowance } =
@@ -14,6 +15,18 @@ export const Swap = () => {
             setLastInputValue(index)(v);
         },
         [setLastInputValue],
+    );
+
+    const functionHandler = useCallback(
+        (fn: () => Promise<unknown>) => async () => {
+            const promiseFn = fn();
+            toast.promise(promiseFn, {
+                loading: 'Loading...',
+                success: 'Success',
+                error: 'An error ocurred, please try again',
+            });
+        },
+        []
     );
 
     return (
@@ -38,9 +51,9 @@ export const Swap = () => {
             <SwapDetail path={path} values={values} />
             <SwapActionButtonWrapper>
                 {isEnoughAllowance ? (
-                    <SwapActionButton onClick={swap}>Swap</SwapActionButton>
+                    <SwapActionButton onClick={functionHandler(swap)}>Swap</SwapActionButton>
                 ) : (
-                    <SwapActionButton onClick={approve}>Approve</SwapActionButton>
+                    <SwapActionButton onClick={functionHandler(approve)}>Approve</SwapActionButton>
                 )}
             </SwapActionButtonWrapper>
         </SwapWrapper>
