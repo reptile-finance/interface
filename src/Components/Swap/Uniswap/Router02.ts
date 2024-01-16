@@ -46,7 +46,7 @@ export class Router02 extends EventEmitter<Events> {
         } else if (this.token1 === zeroAddress) {
             method = lastInput === 0 ? 'swapExactTokensForETH' : 'swapTokensForExactETH';
         }
-        const sortestPath = this.findSortestPath();
+        const { path: shortestPath } = this.findShortestPath();
 
         let swapPromise: Promise<WriteContractResult>;
 
@@ -58,7 +58,7 @@ export class Router02 extends EventEmitter<Events> {
                     functionName: method,
                     args: [
                         BigInt(substractPercentage(this.value0, this.slippage)),
-                        sortestPath,
+                        shortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
                     ],
@@ -71,7 +71,7 @@ export class Router02 extends EventEmitter<Events> {
                     address: this.uniswapConfig.router,
                     abi: UniswapV2Router02ABI,
                     functionName: method,
-                    args: [BigInt(this.value1), sortestPath, toAddress, BigInt(Date.now() + 1000 * 60 * 10)],
+                    args: [BigInt(this.value1), shortestPath, toAddress, BigInt(Date.now() + 1000 * 60 * 10)],
                     value: BigInt(this.value0),
                     chainId: Number(this.config.id),
                 }).then((prepared) => writeContract(prepared.request));
@@ -84,7 +84,7 @@ export class Router02 extends EventEmitter<Events> {
                     args: [
                         BigInt(this.value0),
                         BigInt(substractPercentage(this.value1, this.slippage)),
-                        sortestPath,
+                        shortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
                     ],
@@ -99,7 +99,7 @@ export class Router02 extends EventEmitter<Events> {
                     args: [
                         BigInt(this.value1),
                         BigInt(substractPercentage(this.value0, this.slippage)),
-                        sortestPath,
+                        shortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
                     ],
@@ -114,7 +114,7 @@ export class Router02 extends EventEmitter<Events> {
                     args: [
                         BigInt(this.value0),
                         BigInt(substractPercentage(this.value1, this.slippage)),
-                        sortestPath,
+                        shortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
                     ],
@@ -129,7 +129,7 @@ export class Router02 extends EventEmitter<Events> {
                     args: [
                         BigInt(this.value1),
                         BigInt(this.value0),
-                        sortestPath,
+                        shortestPath,
                         toAddress,
                         BigInt(Date.now() + 1000 * 60 * 10),
                     ],
@@ -198,12 +198,12 @@ export class Router02 extends EventEmitter<Events> {
         return getAllPaths(this.normalizedToken0, this.normalizedToken1, this.pools);
     }
 
-    public findSortestPath() {
+    public findShortestPath() {
         const paths = this.findPaths();
-        const sortestPath = paths.reduce((prev, curr) => {
+        const shortestPath = paths.reduce((prev, curr) => {
             return prev.path.length > curr.path.length && curr.path.length > 1 ? curr : prev;
         }, paths[0]);
-        return sortestPath;
+        return shortestPath;
     }
 
     private checkConfig() {
@@ -249,8 +249,8 @@ export class Router02 extends EventEmitter<Events> {
     private attachEvents() {
         this.on('amountsOutReq', ({ reqId }) => {
             this.addRequestOnFlight();
-            const sortestPath = this.findSortestPath();
-            this.getAmountsOut(sortestPath.path)
+            const shortestPath = this.findShortestPath();
+            this.getAmountsOut(shortestPath.path)
                 .then((amountsOut) => {
                     this.emit('amountsOut', { reqId, amountsOut });
                 })
@@ -259,8 +259,8 @@ export class Router02 extends EventEmitter<Events> {
 
         this.on('amountsInReq', ({ reqId }) => {
             this.addRequestOnFlight();
-            const sortestPath = this.findSortestPath();
-            this.getAmountsIn(sortestPath.path)
+            const shortestPath = this.findShortestPath();
+            this.getAmountsIn(shortestPath.path)
                 .then((amountsIn) => {
                     this.emit('amountsIn', { reqId, amountsIn });
                 })

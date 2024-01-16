@@ -3,9 +3,9 @@ import { useAccount, useChainId, usePublicClient } from 'wagmi';
 import { AsyncResult, initialAsyncResultValue } from '../Utils/AsyncResult';
 import { useFarms } from './useFarms';
 import FarmControllerAbi from '../ABI/FarmController.json';
-import { readContract } from 'viem/contract';
 import { Config } from '../Config';
 import { EncodedUserInfo, UserInfo } from '../Models/UserInfo';
+import { readContract } from 'wagmi/actions';
 
 type UserStake = UserInfo;
 
@@ -22,7 +22,7 @@ export const useFarmsStake = () => {
 
     const fetchFarmStakeInfo = useCallback(
         async (i: number) => {
-            return readContract(publicClient, {
+            return readContract({
                 address: config.farmController,
                 functionName: 'usersInfo',
                 args: [i, address],
@@ -32,7 +32,7 @@ export const useFarmsStake = () => {
                 return { amount, rewardDebt };
             });
         },
-        [address, config.farmController, publicClient],
+        [address, config.farmController],
     );
 
     useEffect(() => {

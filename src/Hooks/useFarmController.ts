@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AsyncResult, initialAsyncResultValue } from '../Utils/AsyncResult';
-import { useChainId, usePublicClient, useWalletClient } from 'wagmi';
+import { useChainId } from 'wagmi';
 import FarmControllerAbi from '../ABI/FarmController.json';
-import { readContract, writeContract } from 'viem/contract';
+import { readContract, writeContract } from 'wagmi/actions';
 import { Config } from '../Config';
 
 interface FarmControllerData {
@@ -13,30 +13,28 @@ interface FarmControllerData {
 export const useFarmController = () => {
     const [result, setResult] = useState<AsyncResult<FarmControllerData>>(initialAsyncResultValue);
     const chainId = useChainId();
-    const publicClient = usePublicClient();
-    const walletClient = useWalletClient();
 
     const config = Config[chainId];
 
     const fetchFarmControllerData = useCallback(async () => {
-        const totalAllocatedPoints = await readContract(publicClient, {
+        const totalAllocatedPoints = await readContract({
             address: config.farmController,
             functionName: 'totalAllocatedPoints',
             abi: FarmControllerAbi,
         });
 
-        const totalRewardPerBlock = await readContract(publicClient, {
+        const totalRewardPerBlock = await readContract({
             address: config.farmController,
             functionName: 'totalRewardPerBlock',
             abi: FarmControllerAbi,
         });
 
         return { totalAllocatedPoints, totalRewardPerBlock } as FarmControllerData;
-    }, [config.farmController, publicClient]);
+    }, [config.farmController]);
 
     const stake = useCallback(
         async (farmIndex: number, amount: bigint) => {
-            const tx = writeContract(walletClient.data, {
+            const tx = writeContract({
                 functionName: 'deposit',
                 abi: FarmControllerAbi,
                 address: config.farmController,
@@ -46,12 +44,12 @@ export const useFarmController = () => {
 
             return tx;
         },
-        [config.farmController, walletClient.data],
+        [config.farmController],
     );
 
     const unstake = useCallback(
         async (farmIndex: number, amount: bigint) => {
-            const tx = writeContract(walletClient.data, {
+            const tx = writeContract({
                 functionName: 'withdraw',
                 abi: FarmControllerAbi,
                 address: config.farmController,
@@ -61,7 +59,7 @@ export const useFarmController = () => {
 
             return tx;
         },
-        [config.farmController, walletClient.data],
+        [config.farmController],
     );
 
     useEffect(() => {

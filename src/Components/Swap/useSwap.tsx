@@ -128,7 +128,7 @@ export const useSwap = () => {
     }, [pools]);
 
     useEffect(() => {
-        const path = router02.findSortestPath();
+        const path = router02.findShortestPath();
         setPath(path?.path);
     }, [token0, token1]);
 

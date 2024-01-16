@@ -10,7 +10,7 @@ export const usePriceImpact = () => {
 
     const calcPriceImpact = useCallback(
         async (amountsOut: string[]) => {
-            const sortestPath = router02.findSortestPath();
+            const sortestPath = router02.findShortestPath();
             const pathWithReserves = await getReservesByPools(sortestPath.pools);
             const midPrice = calcMidPrice(pathWithReserves);
             const aIn = amountsOut[0];
