@@ -3,6 +3,8 @@ import './App.css';
 
 import { RecoilRoot } from 'recoil';
 import { WagmiConfig } from 'wagmi';
+import "react-toastify/dist/ReactToastify.min.css";
+import { ToastContainer } from 'react-toastify';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { wagmiConfig, chains } from './Providers/Blockchain';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -46,6 +48,7 @@ function App() {
                         </ThemeProvider>
                         <Updater />
                         <Notifications />
+                        <ToastContainer />
                     </RecoilRoot>
                 </RainbowKitProvider>
             </WagmiConfig>

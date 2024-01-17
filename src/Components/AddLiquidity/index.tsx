@@ -16,6 +16,7 @@ import { useLiquidity } from '../../Hooks/useLiquidity';
 import { usePool2 } from '../../Hooks/usePool2';
 import { useAddLiquidity } from './useAddLiquidity';
 import { LiquiditySummary } from './LiquiditySummary';
+import toast from 'react-hot-toast';
 
 const STATES: { [state: string]: string } = {
     WRONG_TOKENS: 'Choose tokens',
@@ -81,15 +82,26 @@ export const AddLiquidity = () => {
         try {
             switch (state) {
                 case 'APPROVE':
-                    await approveTokens();
+                    const aproveTokensPromises = await approveTokens();
+                    toast.promise(Promise.all(aproveTokensPromises), {
+                        loading: 'Approving tokens...',
+                        success: 'Tokens approved',
+                        error: 'An error ocurred, please try again',
+                    });
                     break;
                 case 'ADD_LIQUIDITY':
-                    await addLiquidity({
+                    const addLiquidityPromise = await addLiquidity({
                         token0: token0.address,
                         token1: token1.address,
                         amount0Desired: value[0],
                         amount1Desired: value[1],
                     }).then(({ hash }) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
+
+                    toast.promise(addLiquidityPromise, {
+                        loading: 'Adding liquidity...',
+                        success: 'Liquidity added',
+                        error: 'An error ocurred, please try again',
+                    });
                     break;
             }
         } catch (e) {
