@@ -4,7 +4,10 @@ import { Button } from '../Button';
 export const AddLiquidityWrapper = styled.div`
     border-radius: ${(props) => props.theme.borderRadius};
     border: 1px solid ${(props) => props.theme.borderColor};
-    width: 100%;
+    width: 70%;
+    @media only screen and (max-width: ${(props) => props.theme.breakpoints.md}) {
+        width: 100%;
+    }
 `;
 
 const swapPadding = css`
