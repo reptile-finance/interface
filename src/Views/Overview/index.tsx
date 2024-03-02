@@ -42,7 +42,9 @@ export const Overview = () => {
             case 1:
                 return () => (
                     <SwapWrapper>
-                        <AddLiquidity />
+                        <SwapBox>
+                            <AddLiquidity />
+                        </SwapBox>
                     </SwapWrapper>
                 );
             case 2:
