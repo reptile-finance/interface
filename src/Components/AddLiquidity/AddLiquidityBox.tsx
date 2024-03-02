@@ -40,7 +40,7 @@ export const AddLiquidityBox: React.FC<{
         return () => (
             <>
                 <AddLiquidityBoxToken onClick={() => setSelectorOpen(true)}>
-                    <img src="/custom-token.png" />
+                    <img src="/reptile-token.png" />
                     {data.symbol}
                 </AddLiquidityBoxToken>
                 <span>Balance: {balance}</span>

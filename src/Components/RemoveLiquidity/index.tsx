@@ -114,7 +114,7 @@ export const RemoveLiquidity: React.FC<{
             <RemoveLiquidityWrapper>
                 <RemoveLiquidityInputTokenBalances>
                     <RemoveLiquidityBoxToken>
-                        <img src="/custom-token.png" alt="BNB" />
+                        <img src="/reptile-token.png" alt="BNB" />
                         {token0Data?.symbol}-{token1Data?.symbol} LP
                     </RemoveLiquidityBoxToken>
                     <span>Balance: {toPresentationLength(balanceData.formatted ?? '0')}</span>

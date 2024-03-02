@@ -1,8 +1,8 @@
-import { useChainId } from "wagmi";
-import { Config } from "../../Config";
-import { useFarmController } from "../../Hooks/useFarmController";
-import { useFarms } from "../../Hooks/useFarms";
-import { Button } from "../Button";
+import { useChainId } from 'wagmi';
+import { Config } from '../../Config';
+import { useFarmController } from '../../Hooks/useFarmController';
+import { useFarms } from '../../Hooks/useFarms';
+import { Button } from '../Button';
 import {
     FarmsContent,
     FarmsTitle,
@@ -12,26 +12,34 @@ import {
     FarmsTableRowHeader,
     FarmsNameWrapper,
     FarmsLogosWrapper,
-    FarmsActionsWrapper
-} from "./Styles";
-import { formatEther } from "viem";
-import { useFarmsStake } from "../../Hooks/useFarmsStake";
-import { FarmInteractionModal, TFarmInteractionModalType } from "./FarmInteractionModal";
-import { useState } from "react";
-
+    FarmsActionsWrapper,
+} from './Styles';
+import { formatEther } from 'viem';
+import { useFarmsStake } from '../../Hooks/useFarmsStake';
+import { FarmInteractionModal, TFarmInteractionModalType } from './FarmInteractionModal';
+import { useState } from 'react';
 
 export const Farms = () => {
-    const [typeFarmInteraction, setTypeFarmInteraction] = useState<{ type: TFarmInteractionModalType | null, farmIndex?: number }>({ type: null })
+    const [typeFarmInteraction, setTypeFarmInteraction] = useState<{
+        type: TFarmInteractionModalType | null;
+        farmIndex?: number;
+    }>({ type: null });
     const chainId = useChainId();
-    const config = Config[chainId]
+    const config = Config[chainId];
 
     const { result: farms } = useFarms();
-    const { data: { result: farmControllerData } } = useFarmController()
-    const { result: farmsStake } = useFarmsStake()
+    const {
+        data: { result: farmControllerData },
+    } = useFarmController();
+    const { result: farmsStake } = useFarmsStake();
 
     return (
         <FarmsWrapper>
-            <FarmInteractionModal type={typeFarmInteraction.type} lpIndex={typeFarmInteraction.farmIndex} onClose={() => setTypeFarmInteraction({ type: null })} />
+            <FarmInteractionModal
+                type={typeFarmInteraction.type}
+                lpIndex={typeFarmInteraction.farmIndex}
+                onClose={() => setTypeFarmInteraction({ type: null })}
+            />
             <FarmsTitle>
                 <div className="title">Farms</div>
                 <div>Stake your LP tokens to earn Reptiles</div>
@@ -47,33 +55,45 @@ export const Farms = () => {
                         <span></span>
                     </FarmsTableRowHeader>
 
-                    {farms && farmControllerData && farmsStake && farms.map((farm, i: number) => {
-                        const DAY_IN_SECONDS = 3600n * 24n;
-                        const rewardPerDay = (farmControllerData.totalRewardPerBlock * farm.allocPoint * DAY_IN_SECONDS) / (config.secondsPerBlock * farmControllerData.totalAllocatedPoints);
-                        const userStake = farmsStake[i].amount;
-                        const earnedAmount = farm.accCakePerShare * userStake;
-                        const totalStake = farm.totalStake;
-                        return <FarmsTableRow>
-                            <FarmsNameWrapper>
-                                <FarmsLogosWrapper>
-                                    <img src="/custom-token.png" alt="BNB" />
-                                    <img src="/custom-token.png" alt="USDT" />
-                                </FarmsLogosWrapper>
-                                <span className="name">{farm.lpTokenSymbol}</span>
-                            </FarmsNameWrapper>
-                            <span>{formatEther(earnedAmount)} RPTL</span>
-                            <span>{formatEther(rewardPerDay)} RPTL</span>
-                            <span>{formatEther(userStake)} LP</span>
-                            <span>{formatEther(totalStake)} LP</span>
-                            <FarmsActionsWrapper>
-                                <Button onClick={() => setTypeFarmInteraction({ type: 'stake', farmIndex: i })}>Stake</Button>
-                                <Button onClick={() => setTypeFarmInteraction({ type: 'unstake', farmIndex: i })}>Withdraw</Button>
-                            </FarmsActionsWrapper>
-                        </FarmsTableRow>
-                    })}
+                    {farms &&
+                        farmControllerData &&
+                        farmsStake &&
+                        farms.map((farm, i: number) => {
+                            const DAY_IN_SECONDS = 3600n * 24n;
+                            const rewardPerDay =
+                                (farmControllerData.totalRewardPerBlock * farm.allocPoint * DAY_IN_SECONDS) /
+                                (config.secondsPerBlock * farmControllerData.totalAllocatedPoints);
+                            const userStake = farmsStake[i].amount;
+                            const earnedAmount = farm.accCakePerShare * userStake;
+                            const totalStake = farm.totalStake;
+                            return (
+                                <FarmsTableRow>
+                                    <FarmsNameWrapper>
+                                        <FarmsLogosWrapper>
+                                            <img src="/reptile-token.png" alt="BNB" />
+                                            <img src="/reptile-token.png" alt="USDT" />
+                                        </FarmsLogosWrapper>
+                                        <span className="name">{farm.lpTokenSymbol}</span>
+                                    </FarmsNameWrapper>
+                                    <span>{formatEther(earnedAmount)} RPTL</span>
+                                    <span>{formatEther(rewardPerDay)} RPTL</span>
+                                    <span>{formatEther(userStake)} LP</span>
+                                    <span>{formatEther(totalStake)} LP</span>
+                                    <FarmsActionsWrapper>
+                                        <Button onClick={() => setTypeFarmInteraction({ type: 'stake', farmIndex: i })}>
+                                            Stake
+                                        </Button>
+                                        <Button
+                                            onClick={() => setTypeFarmInteraction({ type: 'unstake', farmIndex: i })}
+                                        >
+                                            Withdraw
+                                        </Button>
+                                    </FarmsActionsWrapper>
+                                </FarmsTableRow>
+                            );
+                        })}
                 </FarmsTable>
             </FarmsContent>
-        </FarmsWrapper >
-
+        </FarmsWrapper>
     );
 };
