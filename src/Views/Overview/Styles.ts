@@ -83,17 +83,23 @@ export const SwapWrapper = styled.div`
     width: 100%;
     display: flex;
     gap: 4rem;
+    justify-content: center;
 
     @media (max-width: ${(props) => props.theme.breakpoints.md}) {
         flex-direction: column;
+        align-items: center;
     }
 `;
 
 export const SwapBox = styled.div`
-    max-width: 30rem;
-    width: 100%;
+    width: 50%;
+    @media (max-width: ${(props) => props.theme.breakpoints.md}) {
+        width: 100%;
+    }
 `;
 
 export const LiquidityWrapper = styled.div`
-    width: 50rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 `;

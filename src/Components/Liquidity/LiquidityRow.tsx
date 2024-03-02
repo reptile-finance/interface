@@ -25,8 +25,8 @@ export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAdd
             <LiquidityPositionsRow>
                 <PositionNameWrapper>
                     <PositionLogosWrapper>
-                        <img src="/custom-token.png" alt="BNB" />
-                        <img src="/custom-token.png" alt="USDT" />
+                        <img src="/reptile-token.png" alt="BNB" />
+                        <img src="/reptile-token.png" alt="USDT" />
                     </PositionLogosWrapper>
                     <span className="name">
                         <LiquidityToken address={pool.token0} />

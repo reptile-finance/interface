@@ -18,7 +18,7 @@ export class IconsProvider {
     if (url) {
       return BASE_URL.replace("{{ADDRESS}}", url.toLowerCase());
     }
-    return "/custom-token.png";
+    return "/reptile-token.png";
   }
 
   public static getIconUrlByAddress(address: string): string {
@@ -26,6 +26,6 @@ export class IconsProvider {
     if (symbol) {
       return this.getIconUrl(symbol);
     }
-    return "/custom-token.png";
+    return "/reptile-token.png";
   }
 }

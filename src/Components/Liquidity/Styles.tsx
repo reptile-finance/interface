@@ -3,7 +3,10 @@ import styled from 'styled-components';
 export const LiquidityWrapper = styled.div`
     border-radius: ${(props) => props.theme.borderRadius};
     border: 1px solid ${(props) => props.theme.borderColor};
-    width: 100%;
+    width: 70%;
+    @media only screen and (max-width: ${(props) => props.theme.breakpoints.xs}) {
+        width: 100%;
+    }
 `;
 
 export const LiquidityTitle = styled.div`

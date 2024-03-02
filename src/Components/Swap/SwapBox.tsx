@@ -43,7 +43,7 @@ export const SwapBox: React.FC<{
         return () => (
             <>
                 <SwapBoxToken onClick={() => setSelectorOpen(true)}>
-                    <img src="/custom-token.png" />
+                    <img src="/reptile-token.png" />
                     {data.symbol}
                 </SwapBoxToken>
                 <span>Balance: {balance}</span>

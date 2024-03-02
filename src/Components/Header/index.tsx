@@ -1,7 +1,7 @@
 import { HeaderWrapper, HeaderNavigation, LogoItem, HeaderItem, AccountWrapper, AccountBalance } from './Styles';
 
 import { useNavigate } from 'react-router-dom';
-import Logo from '../../Assets/custom-token.png';
+import Logo from '../../Assets/reptile-navbar-icon.png';
 import { useBalances } from '../../Hooks/useBalances';
 import { useConfig } from '../../Hooks/useConfig';
 import { useMemo } from 'react';
@@ -9,12 +9,16 @@ import { zeroAddress } from 'viem';
 import { formatBalance } from '../../Utils/Bignumber';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useLocation } from 'react-router-dom';
+import { useConnectModal, useAccountModal, useChainModal } from '@rainbow-me/rainbowkit';
 
 export const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { getBalance } = useBalances();
     const { activeChainConfig } = useConfig();
+    const { openConnectModal } = useConnectModal();
+    const { openAccountModal } = useAccountModal();
+    const { openChainModal } = useChainModal();
 
     const balance = useMemo(() => {
         return formatBalance(getBalance(zeroAddress), activeChainConfig?.nativeCurrency.decimals, 4);
@@ -27,8 +31,8 @@ export const Header = () => {
 
     return (
         <HeaderWrapper>
+            <LogoItem src={Logo} alt="logo"/>
             <HeaderNavigation>
-                <LogoItem src={Logo} />
                 <HeaderItem
                     onClick={() => navigate('/overview')}
                     className={/overview/i.test(sectionTitle) ? 'active' : 'no-active'}
@@ -53,6 +57,37 @@ export const Header = () => {
                 >
                     <span>Docs</span>
                 </HeaderItem>
+                {
+                  openAccountModal && (
+                    <HeaderItem
+                      onClick={openAccountModal}
+                      className='wallet'
+                    >
+                        <span>Wallet</span>
+                    </HeaderItem>
+                  )
+                }
+                {
+                  (!openAccountModal && openChainModal) && (
+                    <HeaderItem
+                      onClick={openChainModal}
+                      className='wrong-network'
+                    >
+                        <span>Wrong network</span>
+                    </HeaderItem>
+                  )
+                }
+                {
+                  openConnectModal && (
+                    <HeaderItem
+                      onClick={openConnectModal}
+                      className='wallet'
+                    >
+                        <span>Connect</span>
+                    </HeaderItem>
+                  )
+                }
+
             </HeaderNavigation>
             <AccountWrapper>
                 <AccountBalance>

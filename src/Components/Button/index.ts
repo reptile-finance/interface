@@ -36,8 +36,10 @@ export const Button = styled.button<{ loading?: string; disabled?: boolean }>`
             animation: ${animatedBg} 5s ease infinite;
         `}
 
+    transition: background 0.3s, color 0.5s;
     &:hover {
-        scale: 1.01;
+        background: ${(props) => props.theme.accentColor};
+        color: black !important;
     }
 `;
 

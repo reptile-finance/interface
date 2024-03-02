@@ -27,6 +27,7 @@ export const Farms = () => {
     }>({ type: null });
     const chainId = useChainId();
     const config = Config[chainId];
+
     const { result: farms } = useFarms();
     const {
         data: { result: farmControllerData },
@@ -69,8 +70,8 @@ export const Farms = () => {
                                 <FarmsTableRow>
                                     <FarmsNameWrapper>
                                         <FarmsLogosWrapper>
-                                            <img src="/custom-token.png" alt="BNB" />
-                                            <img src="/custom-token.png" alt="USDT" />
+                                            <img src="/reptile-token.png" alt="BNB" />
+                                            <img src="/reptile-token.png" alt="USDT" />
                                         </FarmsLogosWrapper>
                                         <span className="name">{farm.lpTokenSymbol}</span>
                                     </FarmsNameWrapper>
