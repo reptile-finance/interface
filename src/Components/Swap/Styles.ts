@@ -14,6 +14,7 @@ export const SwapWrapper = styled.div`
     border-radius: ${(props) => props.theme.borderRadius};
     border: 1px solid ${(props) => props.theme.borderColor};
     width: 100%;
+    max-width: 50rem;
 `;
 
 const swapPadding = css`
