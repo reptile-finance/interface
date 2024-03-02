@@ -38,8 +38,12 @@ export const isNaN = (num: string) => {
  */
 export const toPresentationLength = (num: string | number) => BigNumber(num).dp(8).toFixed();
 
-export const formatBalance = (balance: number | string, tokenDecimals: string | number = 18, precisionDecimals = 4) => {
-    return BigNumber(balance).dividedBy(BigNumber(10).pow(tokenDecimals)).dp(precisionDecimals).toFixed();
+export const formatBalance = (
+    balance: number | string | bigint,
+    tokenDecimals: string | number = 18,
+    precisionDecimals = 4,
+) => {
+    return BN(balance).dividedBy(BigNumber(10).pow(tokenDecimals)).dp(precisionDecimals).toFixed();
 };
 
 export const parseFormattedBalance = (balance: number | string, decimals: string | number = 18) => {
