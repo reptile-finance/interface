@@ -92,7 +92,9 @@ export const SwapWrapper = styled.div`
 `;
 
 export const SwapBox = styled.div`
-    width: 50%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
     @media (max-width: ${(props) => props.theme.breakpoints.md}) {
         width: 100%;
     }
