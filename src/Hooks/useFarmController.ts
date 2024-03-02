@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AsyncResult, initialAsyncResultValue } from '../Utils/AsyncResult';
-import { useChainId } from 'wagmi';
+import { useChainId, usePublicClient } from 'wagmi';
 import FarmControllerAbi from '../ABI/FarmController.json';
 import { readContract, writeContract } from 'wagmi/actions';
 import { Config } from '../Config';
@@ -13,24 +13,22 @@ interface FarmControllerData {
 export const useFarmController = () => {
     const [result, setResult] = useState<AsyncResult<FarmControllerData>>(initialAsyncResultValue);
     const chainId = useChainId();
-
+    const publicClient = usePublicClient();
     const config = Config[chainId];
 
     const fetchFarmControllerData = useCallback(async () => {
-        const totalAllocatedPoints = await readContract({
+        const totalAllocatedPoints = await publicClient.readContract({
             address: config.farmController,
             functionName: 'totalAllocatedPoints',
             abi: FarmControllerAbi,
         });
-
-        const totalRewardPerBlock = await readContract({
+        const totalRewardPerBlock = await publicClient.readContract({
             address: config.farmController,
             functionName: 'totalRewardPerBlock',
             abi: FarmControllerAbi,
         });
-
         return { totalAllocatedPoints, totalRewardPerBlock } as FarmControllerData;
-    }, [config.farmController]);
+    }, [config.farmController, publicClient]);
 
     const stake = useCallback(
         async (farmIndex: number, amount: bigint) => {

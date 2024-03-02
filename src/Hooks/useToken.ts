@@ -1,21 +1,46 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EthAddress } from '../Types';
-import { fetchToken } from 'wagmi/actions';
 import { zeroAddress } from 'viem';
 import { useRecoilState } from 'recoil';
 import { TokensState } from '../State/Tokens';
 import { useConfig } from './useConfig';
+import { erc20ABI, usePublicClient } from 'wagmi';
 
 export const useToken = ({ address }: { address: EthAddress | undefined }) => {
     const [isLoading, setLoading] = useState(false);
     const [isError, setError] = useState(false);
     const [tokens, setTokens] = useRecoilState(TokensState);
     const { config, activeChainConfig } = useConfig();
+    const publicClient = usePublicClient();
+
+    const fetchToken = useCallback(
+        (address: EthAddress) => {
+            const name = publicClient.readContract({
+                address,
+                abi: erc20ABI,
+                functionName: 'name',
+            });
+            const symbol = publicClient.readContract({
+                address,
+                abi: erc20ABI,
+                functionName: 'symbol',
+            });
+            const decimals = publicClient.readContract({
+                address,
+                abi: erc20ABI,
+                functionName: 'decimals',
+            });
+            return Promise.all([name, symbol, decimals]).then(([name, symbol, decimals]) => {
+                return { name, symbol, decimals, address };
+            });
+        },
+        [publicClient],
+    );
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
         const chainCfg = activeChainConfig;
-        if (!address || !chainCfg) return;
+        if (!chainCfg) return;
         setLoading(true);
 
         if (address === zeroAddress) {
@@ -35,7 +60,7 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
             return;
         }
 
-        fetchToken({ address, chainId: Number(config.id) })
+        fetchToken(address)
             .then((data) => {
                 setTokens((st) => ({
                     ...st,
@@ -57,7 +82,7 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [address, activeChainConfig, config.id, isLoading, setTokens]);
+    }, [isLoading, activeChainConfig, address, fetchToken, setTokens, config.id]);
 
     useEffect(() => {
         if (!address) return;

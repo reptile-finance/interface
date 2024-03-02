@@ -1,5 +1,5 @@
-import { Farms } from "../../Components/Farms";
-import { FarmsWrapper } from "./Styles";
+import { Farms } from '../../Components/Farms';
+import { FarmsWrapper } from './Styles';
 
 export const Earn = () => {
     return (
@@ -9,4 +9,4 @@ export const Earn = () => {
             </FarmsWrapper>
         </>
     );
-}
+};

@@ -5,7 +5,6 @@ import { useFarms } from './useFarms';
 import FarmControllerAbi from '../ABI/FarmController.json';
 import { Config } from '../Config';
 import { EncodedUserInfo, UserInfo } from '../Models/UserInfo';
-import { readContract } from 'wagmi/actions';
 
 type UserStake = UserInfo;
 
@@ -17,22 +16,24 @@ export const useFarmsStake = () => {
     const { address } = useAccount();
     const { result: farms } = useFarms();
     const config = Config[chainId];
-
     const [result, setResult] = useState<AsyncResult<UserFarmStakeInfo>>(initialAsyncResultValue);
 
     const fetchFarmStakeInfo = useCallback(
         async (i: number) => {
-            return readContract({
-                address: config.farmController,
-                functionName: 'usersInfo',
-                args: [i, address],
-                abi: FarmControllerAbi,
-            }).then((e) => {
-                const [amount, rewardDebt] = e as EncodedUserInfo;
-                return { amount, rewardDebt };
-            });
+            if (!address || !farms) return { amount: 0n, rewardDebt: 0n };
+            return publicClient
+                .readContract({
+                    address: config.farmController,
+                    functionName: 'usersInfo',
+                    args: [i, address],
+                    abi: FarmControllerAbi,
+                })
+                .then((e) => {
+                    const [amount, rewardDebt] = e as EncodedUserInfo;
+                    return { amount, rewardDebt };
+                });
         },
-        [address, config.farmController],
+        [address, config.farmController, farms, publicClient],
     );
 
     useEffect(() => {

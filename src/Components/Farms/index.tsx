@@ -18,6 +18,7 @@ import { formatEther } from 'viem';
 import { useFarmsStake } from '../../Hooks/useFarmsStake';
 import { FarmInteractionModal, TFarmInteractionModalType } from './FarmInteractionModal';
 import { useState } from 'react';
+import { formatBalance } from '../../Utils/Bignumber';
 
 export const Farms = () => {
     const [typeFarmInteraction, setTypeFarmInteraction] = useState<{
@@ -57,13 +58,12 @@ export const Farms = () => {
 
                     {farms &&
                         farmControllerData &&
-                        farmsStake &&
                         farms.map((farm, i: number) => {
                             const DAY_IN_SECONDS = 3600n * 24n;
                             const rewardPerDay =
                                 (farmControllerData.totalRewardPerBlock * farm.allocPoint * DAY_IN_SECONDS) /
                                 (config.secondsPerBlock * farmControllerData.totalAllocatedPoints);
-                            const userStake = farmsStake[i].amount;
+                            const userStake = farmsStake ? farmsStake[i].amount : 0n;
                             const earnedAmount = farm.accCakePerShare * userStake;
                             const totalStake = farm.totalStake;
                             return (
@@ -78,7 +78,7 @@ export const Farms = () => {
                                     <span>{formatEther(earnedAmount)} RPTL</span>
                                     <span>{formatEther(rewardPerDay)} RPTL</span>
                                     <span>{formatEther(userStake)} LP</span>
-                                    <span>{formatEther(totalStake)} LP</span>
+                                    <span>{formatBalance(totalStake, 18, 4)} LP</span>
                                     <FarmsActionsWrapper>
                                         <Button onClick={() => setTypeFarmInteraction({ type: 'stake', farmIndex: i })}>
                                             Stake
