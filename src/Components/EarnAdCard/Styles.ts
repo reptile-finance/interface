@@ -3,7 +3,8 @@ import { Button } from '../Button';
 import { FaCoins } from 'react-icons/fa6';
 
 export const EarnAdCardWrapper = styled.div`
-    width: 30rem;
+    max-width: 30rem;
+    width: 100%;
     border: 1px solid ${(props) => props.theme.borderColor};
     border-radius: ${(props) => props.theme.borderRadius};
     background: linear-gradient(30deg, ${(props) => props.theme.accentColor} 0%, #000000 100%);
