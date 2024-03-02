@@ -12,21 +12,23 @@ import {
     WelcomeMsg,
 } from './Styles';
 import { formatBalance } from '../../Utils/Bignumber';
-import { zeroAddress } from 'viem';
 import { Swap } from '../../Components/Swap';
 import { AddLiquidity } from '../../Components/AddLiquidity';
 import { Liquidity } from '../../Components/Liquidity';
-import { useConfig } from '../../Hooks/useConfig';
 import { EarnAdCard } from '../../Components/EarnAdCard';
+import { useConfig } from '../../Hooks/useConfig';
+import { useToken } from '../../Hooks/useToken';
 
 export const Overview = () => {
     const { getBalance } = useBalances();
-    const { activeChainConfig } = useConfig();
     const [activeTab, setActiveTab] = useState(0);
+    const { uniswapConfig } = useConfig();
+    const { data } = useToken({ address: uniswapConfig.token });
 
     const userBalance = useMemo(() => {
-        return formatBalance(getBalance(zeroAddress), activeChainConfig.nativeCurrency.decimals, 4);
-    }, [activeChainConfig.nativeCurrency.decimals, getBalance]);
+        if (!data) return '0';
+        return formatBalance(getBalance(uniswapConfig.token), data.decimals, 4);
+    }, [data, getBalance, uniswapConfig.token]);
 
     const Tab = useMemo(() => {
         switch (activeTab) {
@@ -64,7 +66,7 @@ export const Overview = () => {
             <OverviewBalance>
                 <WelcomeMsg>Welcome, you have</WelcomeMsg>
                 <WelcomeBalance>
-                    {userBalance} <span>{activeChainConfig?.nativeCurrency.symbol}</span>
+                    {userBalance} <span>{data?.symbol}</span>
                 </WelcomeBalance>
             </OverviewBalance>
             <Tabs>

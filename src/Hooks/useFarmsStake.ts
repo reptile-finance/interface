@@ -38,10 +38,8 @@ export const useFarmsStake = () => {
 
     useEffect(() => {
         if (!farms || farms.length === 0) return;
-
         setResult(initialAsyncResultValue);
         const promises = farms.map((_, i) => fetchFarmStakeInfo(i));
-
         Promise.all(promises).then((data) => setResult({ result: data, loading: false, error: null }));
     }, [farms, fetchFarmStakeInfo, setResult]);
 
