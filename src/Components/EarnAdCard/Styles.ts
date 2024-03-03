@@ -17,7 +17,7 @@ const GradientBackground = keyframes`
 `;
 
 export const EarnAdCardWrapper = styled.div`
-    width: 50%;
+    width: auto;
     border: 1px solid ${(props) => props.theme.borderColor};
     border-radius: ${(props) => props.theme.borderRadius};
     background: linear-gradient(45deg, #000000, #4CAF50);

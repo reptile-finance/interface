@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { wagmiConfig, chains } from './Providers/Blockchain';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { Overview } from './Views/Overview';
+import { Trade } from './Views/Trade';
 import { ThemeProvider } from 'styled-components';
 import { base } from './Theme';
 import { Toaster } from 'react-hot-toast';
@@ -30,8 +30,8 @@ const router = createBrowserRouter([
             </>
         ),
         children: [
-            { path: '/', element: <Overview />, index: true },
-            { path: '/overview', element: <Overview /> },
+            { path: '/', element: <Trade />, index: true },
+            { path: '/trade', element: <Trade /> },
             { path: '/earn', element: <Earn />}
         ],
     },

@@ -15,6 +15,11 @@ export const SwapWrapper = styled.div`
     border: 1px solid ${(props) => props.theme.borderColor};
     width: 100%;
     max-width: 50rem;
+
+    @media only screen and (max-width: ${(props) => props.theme.breakpoints.md}) {
+        width: 100%;
+        max-width: 100%;
+    }
 `;
 
 const swapPadding = css`

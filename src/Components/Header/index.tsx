@@ -10,6 +10,12 @@ import { formatBalance } from '../../Utils/Bignumber';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useLocation } from 'react-router-dom';
 import { useConnectModal, useAccountModal, useChainModal } from '@rainbow-me/rainbowkit';
+import { GrOverview } from 'react-icons/gr';
+import { CiMoneyBill } from 'react-icons/ci';
+import { PiMagnifyingGlass, PiMoney } from 'react-icons/pi';
+import { IoDocumentOutline, IoWalletOutline } from 'react-icons/io5';
+
+
 
 export const Header = () => {
     const location = useLocation();
@@ -31,63 +37,54 @@ export const Header = () => {
 
     return (
         <HeaderWrapper>
-            <LogoItem src={Logo} alt="logo"/>
+            <LogoItem src={Logo} alt="logo" onClick={() => navigate('/trade')}/>
             <HeaderNavigation>
                 <HeaderItem
-                    onClick={() => navigate('/overview')}
-                    className={/overview/i.test(sectionTitle) ? 'active' : 'no-active'}
+                    onClick={() => navigate('/trade')}
+                    className={/trade/i.test(sectionTitle) ? 'active' : 'no-active'}
                 >
-                    <span>Overview</span>
+                    <span>Trade</span>
+                    <GrOverview />
                 </HeaderItem>
                 <HeaderItem
                     onClick={() => navigate('/earn')}
                     className={/earn/i.test(sectionTitle) ? 'active' : 'no-active'}
                 >
                     <span>Earn</span>
+                    <PiMoney />
                 </HeaderItem>
                 <HeaderItem
                     onClick={() => window.open('https://testnet.opbnbscan.com/', '_blank')}
                     className={/explorer/i.test(sectionTitle) ? 'active' : 'no-active'}
                 >
                     <span>Explorer</span>
+                    <PiMagnifyingGlass />
                 </HeaderItem>
                 <HeaderItem
                     onClick={() => window.open('https://google.com', '_blank')}
                     className={/docs/i.test(sectionTitle) ? 'active' : 'no-active'}
                 >
                     <span>Docs</span>
+                    <IoDocumentOutline />
                 </HeaderItem>
-                {
-                  openAccountModal && (
-                    <HeaderItem
-                      onClick={openAccountModal}
-                      className='wallet'
-                    >
+                {openAccountModal && (
+                    <HeaderItem onClick={openAccountModal} className="wallet">
                         <span>Wallet</span>
+                        <IoWalletOutline />
                     </HeaderItem>
-                  )
-                }
-                {
-                  (!openAccountModal && openChainModal) && (
-                    <HeaderItem
-                      onClick={openChainModal}
-                      className='wrong-network'
-                    >
+                )}
+                {!openAccountModal && openChainModal && (
+                    <HeaderItem onClick={openChainModal} className="wrong-network">
                         <span>Wrong network</span>
+                        <IoWalletOutline />
                     </HeaderItem>
-                  )
-                }
-                {
-                  openConnectModal && (
-                    <HeaderItem
-                      onClick={openConnectModal}
-                      className='wallet'
-                    >
+                )}
+                {openConnectModal && (
+                    <HeaderItem onClick={openConnectModal} className="wallet">
                         <span>Connect</span>
+                        <IoWalletOutline />
                     </HeaderItem>
-                  )
-                }
-
+                )}
             </HeaderNavigation>
             <AccountWrapper>
                 <AccountBalance>

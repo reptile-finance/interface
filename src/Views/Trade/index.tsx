@@ -19,7 +19,7 @@ import { Liquidity } from '../../Components/Liquidity';
 import { useConfig } from '../../Hooks/useConfig';
 import { EarnAdCard } from '../../Components/EarnAdCard';
 
-export const Overview = () => {
+export const Trade = () => {
     const { getBalance } = useBalances();
     const { activeChainConfig } = useConfig();
     const [activeTab, setActiveTab] = useState(0);
