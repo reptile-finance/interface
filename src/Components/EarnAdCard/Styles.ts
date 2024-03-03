@@ -1,29 +1,14 @@
-import styled, {keyframes} from 'styled-components';
+import styled from 'styled-components';
 import { Button } from '../Button';
 import { FaCoins } from 'react-icons/fa6';
-
-const GradientBackground = keyframes`
-    0% {
-    background-position: 0% 50%;
-    }
-
-    50% {
-    background-position: 100% 50%;
-    }
-
-    100% {
-    background-position: 0% 50%;
-    }
-`;
+import BackgroundImage from '../../Assets/Backgrounds/green_gradient.jpg';
 
 export const EarnAdCardWrapper = styled.div`
     width: auto;
     border: 1px solid ${(props) => props.theme.borderColor};
     border-radius: ${(props) => props.theme.borderRadius};
-    background: linear-gradient(45deg, #000000, #4CAF50);
-    background-size: 400% 400%;
-    animation: GradientBackground 10s ease infinite;
-    animation: ${GradientBackground} 10s ease infinite;
+    background: url(${BackgroundImage});
+    background-size: cover;
     @media (max-width: ${(props) => props.theme.breakpoints.md}) {
         width: 100%;
     }
@@ -66,6 +51,11 @@ export const EarnAdCardBody = styled.div`
 export const EarnActionButton = styled(Button)`
     width: 100%;
     margin-top: 1rem;
-    background: rgba(23, 32, 38, 255);
+    background-color: transparent;
     padding: 0.75rem;
+    border: 1px solid #fff;
+    color: #fff;
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.7);
+    }
 `;
