@@ -5,6 +5,7 @@ import { TokensState } from '../State/Tokens';
 import { ConfigState } from '../State/Config';
 import { useNetwork } from 'wagmi';
 import { opBnbChain } from '../Providers/Blockchain';
+import { BlockchainContractsConfig, Config } from '../Config';
 
 const DEFAULT_CONFIG = opBnbChain;
 
@@ -18,6 +19,10 @@ export const useConfig = () => {
         if (!findChain) return DEFAULT_CONFIG;
         return findChain;
     }, [chains, config.chainId]);
+
+    const uniswapConfig: BlockchainContractsConfig = useMemo(() => {
+        return Config[activeChainConfig.id.toString()];
+    }, [activeChainConfig]);
 
     const updateAppConfig = useCallback(async () => {
         const appConfig = (await fetch('/Config.json').then((res) => res.json())) as AppConfig;
@@ -44,5 +49,5 @@ export const useConfig = () => {
         return { ...config.appConfig[config.chainId], id: config.chainId };
     }, [config]);
 
-    return { config: appConfig, activeChainConfig, userConfig: config.user, getTokens, updateAppConfig };
+    return { config: appConfig, activeChainConfig, userConfig: config.user, uniswapConfig, getTokens, updateAppConfig };
 };
