@@ -78,18 +78,21 @@ export const AddLiquidity = () => {
     ]);
 
     const onSubmit = useCallback(async () => {
-        setLoading((st) => (st += 1));
         try {
             switch (state) {
                 case 'APPROVE':
+                    setLoading(1);
                     const aproveTokensPromises = await approveTokens();
-                    toast.promise(Promise.all(aproveTokensPromises), {
-                        loading: 'Approving tokens...',
-                        success: 'Tokens approved',
-                        error: 'An error ocurred, please try again',
-                    });
+                    toast
+                        .promise(Promise.all(aproveTokensPromises), {
+                            loading: 'Approving tokens...',
+                            success: 'Tokens approved',
+                            error: 'An error ocurred, please try again',
+                        })
+                        .finally(() => setLoading(0));
                     break;
                 case 'ADD_LIQUIDITY':
+                    setLoading(1);
                     const addLiquidityPromise = await addLiquidity({
                         token0: token0.address,
                         token1: token1.address,
@@ -97,20 +100,21 @@ export const AddLiquidity = () => {
                         amount1Desired: value[1],
                     }).then(({ hash }) => waitForTransaction({ hash, chainId: activeChainConfig.id }));
 
-                    toast.promise(addLiquidityPromise, {
-                        loading: 'Adding liquidity...',
-                        success: 'Liquidity added',
-                        error: 'An error ocurred, please try again',
-                    });
+                    toast
+                        .promise(addLiquidityPromise, {
+                            loading: 'Adding liquidity...',
+                            success: 'Liquidity added',
+                            error: 'An error ocurred, please try again',
+                        })
+                        .finally(() => setLoading(0));
                     break;
             }
         } catch (e) {
             console.error(e);
+            setLoading(0);
             eventBus.emit('NOTIFICATION', Notification.buildNotification('error', e.shortMessage || e.message));
-        } finally {
-            setLoading((st) => (st -= 1));
         }
-    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0, token1, value]);
+    }, [activeChainConfig.id, addLiquidity, approveTokens, state, token0, token1, value, setLoading]);
 
     const buttonText = useMemo(() => {
         if (loading > 0) return 'Loading...';

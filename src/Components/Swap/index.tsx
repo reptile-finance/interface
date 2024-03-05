@@ -2,13 +2,14 @@ import { zeroAddress } from 'viem';
 import { SwapActionButton, SwapActionButtonWrapper, SwapHeader, SwapWrapper } from './Styles';
 import { SwapBox } from './SwapBox';
 import { SwapDetail } from './SwapDetail';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useSwap } from './useSwap';
 import toast from 'react-hot-toast';
 
 export const Swap = () => {
     const { approve, values, setLastInputValue, setToken0, setToken1, loading, path, swap, isEnoughAllowance } =
         useSwap();
+    const [buttonLoading, setButtonLoading] = useState('');
 
     const onChangeInput = useCallback(
         (index: 0 | 1) => (v: string) => {
@@ -19,14 +20,19 @@ export const Swap = () => {
 
     const functionHandler = useCallback(
         (fn: () => Promise<unknown>) => async () => {
+            setButtonLoading('true');
             const promiseFn = fn();
-            toast.promise(promiseFn, {
-                loading: 'Loading...',
-                success: 'Success',
-                error: 'An error ocurred, please try again',
-            });
+            toast
+                .promise(promiseFn, {
+                    loading: 'Loading...',
+                    success: 'Success',
+                    error: 'An error ocurred, please try again',
+                })
+                .finally(() => {
+                    setButtonLoading('');
+                });
         },
-        [],
+        [setButtonLoading, buttonLoading, toast],
     );
 
     return (
@@ -51,9 +57,13 @@ export const Swap = () => {
             <SwapDetail path={path} values={values} />
             <SwapActionButtonWrapper>
                 {isEnoughAllowance ? (
-                    <SwapActionButton onClick={functionHandler(swap)}>Swap</SwapActionButton>
+                    <SwapActionButton loading={buttonLoading} onClick={functionHandler(swap)}>
+                        Swap
+                    </SwapActionButton>
                 ) : (
-                    <SwapActionButton onClick={functionHandler(approve)}>Approve</SwapActionButton>
+                    <SwapActionButton loading={buttonLoading} onClick={functionHandler(approve)}>
+                        Approve
+                    </SwapActionButton>
                 )}
             </SwapActionButtonWrapper>
         </SwapWrapper>
