@@ -6,6 +6,7 @@ import { TokenSelector } from '../TokenSelector';
 import { EthAddress, TokenMetadata } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { IconsProvider } from '../../Providers/Icons';
 
 export const SwapBox: React.FC<{
     defaultToken?: EthAddress;
@@ -43,7 +44,7 @@ export const SwapBox: React.FC<{
         return () => (
             <>
                 <SwapBoxToken onClick={() => setSelectorOpen(true)}>
-                    <img src="/reptile-token.png" />
+                    <img src={IconsProvider.getIconUrlByAddress(data.address)} />
                     {data.symbol}
                 </SwapBoxToken>
                 <span>Balance: {balance}</span>
