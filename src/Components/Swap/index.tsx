@@ -26,7 +26,7 @@ export const Swap = () => {
                 error: 'An error ocurred, please try again',
             });
         },
-        []
+        [],
     );
 
     return (
