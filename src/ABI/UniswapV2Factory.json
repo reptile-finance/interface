@@ -122,6 +122,21 @@
     {
         "constant": true,
         "inputs": [],
+        "name": "reptileFinanceVault",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
         "name": "feeToSetter",
         "outputs": [
             {

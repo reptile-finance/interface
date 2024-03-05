@@ -16,7 +16,7 @@ export const opBnbChain: Chain = {
     blockExplorers: {
         default: {
             name: 'opBNBScan',
-            url: 'https://testnet.opbnbscan.com',
+            url: 'https://opbnb-testnet.bscscan.com',
         },
     },
     rpcUrls: {

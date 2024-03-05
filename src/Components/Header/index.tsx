@@ -1,5 +1,4 @@
 import { HeaderWrapper, HeaderNavigation, LogoItem, HeaderItem, AccountWrapper, AccountBalance } from './Styles';
-
 import { useNavigate } from 'react-router-dom';
 import Logo from '../../Assets/reptile-navbar-icon.png';
 import { useBalances } from '../../Hooks/useBalances';
@@ -11,11 +10,9 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useLocation } from 'react-router-dom';
 import { useConnectModal, useAccountModal, useChainModal } from '@rainbow-me/rainbowkit';
 import { GrOverview } from 'react-icons/gr';
-import { CiMoneyBill } from 'react-icons/ci';
 import { PiMagnifyingGlass, PiMoney } from 'react-icons/pi';
 import { IoDocumentOutline, IoWalletOutline } from 'react-icons/io5';
-
-
+import { GiReptileTail } from 'react-icons/gi';
 
 export const Header = () => {
     const location = useLocation();
@@ -37,7 +34,7 @@ export const Header = () => {
 
     return (
         <HeaderWrapper>
-            <LogoItem src={Logo} alt="logo" onClick={() => navigate('/trade')}/>
+            <LogoItem src={Logo} alt="logo" onClick={() => navigate('/trade')} />
             <HeaderNavigation>
                 <HeaderItem
                     onClick={() => navigate('/trade')}
@@ -54,7 +51,14 @@ export const Header = () => {
                     <PiMoney />
                 </HeaderItem>
                 <HeaderItem
-                    onClick={() => window.open('https://testnet.opbnbscan.com/', '_blank')}
+                    onClick={() => navigate('/reptile')}
+                    className={/reptile/i.test(sectionTitle) ? 'active' : 'no-active'}
+                >
+                    <span>RFT</span>
+                    <GiReptileTail />
+                </HeaderItem>
+                <HeaderItem
+                    onClick={() => window.open('https://opbnb-testnet.bscscan.com/', '_blank')}
                     className={/explorer/i.test(sectionTitle) ? 'active' : 'no-active'}
                 >
                     <span>Explorer</span>

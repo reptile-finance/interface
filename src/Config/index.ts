@@ -8,6 +8,7 @@ export type BlockchainContractsConfig = {
     weth: EthAddress;
     token: EthAddress;
     farmController: EthAddress;
+    treasury: EthAddress;
     secondsPerBlock: bigint;
 };
 
@@ -23,6 +24,7 @@ export const Config: {
         weth: '0x4200000000000000000000000000000000000006',
         token: '0x7Ef6ed0895A273e4219cD2A1F1EEa4409b9EADf3',
         farmController: '0x74821D6480f8a0132476dc5a4a945AB85B325F96',
+        treasury: '0x31449334E0534d0a70479bAEEe13C1bdeb656300',
         secondsPerBlock: 1n,
     },
 };

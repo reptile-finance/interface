@@ -1,9 +1,9 @@
 import '@rainbow-me/rainbowkit/styles.css';
 import './App.css';
+import 'react-toastify/dist/ReactToastify.min.css';
 
 import { RecoilRoot } from 'recoil';
 import { WagmiConfig } from 'wagmi';
-import "react-toastify/dist/ReactToastify.min.css";
 import { ToastContainer } from 'react-toastify';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import { wagmiConfig, chains } from './Providers/Blockchain';
@@ -17,6 +17,7 @@ import { ErrorBoundary } from './Components/ErrorBoundary';
 import { Notifications } from './Components/Notifications';
 import { Shell } from './Views/Shell';
 import { Earn } from './Views/Earn';
+import { Reptile } from './Views/Reptile';
 
 const router = createBrowserRouter([
     {
@@ -31,8 +32,9 @@ const router = createBrowserRouter([
         ),
         children: [
             { path: '/', element: <Trade />, index: true },
-            { path: '/trade', element: <Trade /> },
-            { path: '/earn', element: <Earn />}
+            { path: '/overview', element: <Trade /> },
+            { path: '/earn', element: <Earn /> },
+            { path: '/reptile', element: <Reptile /> },
         ],
     },
 ]);

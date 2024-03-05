@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { EthAddress } from '../Types';
-import { readContract } from 'wagmi/actions';
-import { useNetwork } from 'wagmi';
+import { useNetwork, usePublicClient } from 'wagmi';
 import { useConfig } from './useConfig';
 import UniswapHelperABI from '../ABI/UniswapHelper.json';
 import { useUniswap } from './useUniswap';
@@ -15,6 +14,7 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
     const { config, activeChainConfig } = useConfig();
     const { uniswapConfig } = useUniswap();
     const [reserves, setReserves] = useState<[bigint, bigint]>([0n, 0n]);
+    const publicClient = usePublicClient();
 
     const fetchData = useCallback(() => {
         if (isLoading) return;
@@ -24,13 +24,13 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
         const reducedToken0 = token0 === zeroAddress ? uniswapConfig.weth : token0;
         const reducedToken1 = token1 === zeroAddress ? uniswapConfig.weth : token1;
 
-        readContract({
-            address: uniswapConfig.uniswapHelper,
-            abi: UniswapHelperABI,
-            functionName: 'getReserves',
-            args: [uniswapConfig.factory, reducedToken0, reducedToken1],
-            chainId: Number(activeChainConfig.id),
-        })
+        publicClient
+            .readContract({
+                address: uniswapConfig.uniswapHelper,
+                abi: UniswapHelperABI,
+                functionName: 'getReserves',
+                args: [uniswapConfig.factory, reducedToken0, reducedToken1],
+            })
             .then((data: [bigint, bigint, bigint]) => {
                 setReserves([data[0], data[1]]);
                 setError(false);
@@ -43,7 +43,17 @@ export const usePool2 = ({ token0, token1 }: { token0?: EthAddress; token1?: Eth
             .finally(() => {
                 setLoading(false);
             });
-    }, [activeChainConfig, config, isLoading, token0, token1, uniswapConfig]);
+    }, [
+        activeChainConfig,
+        config,
+        isLoading,
+        publicClient,
+        token0,
+        token1,
+        uniswapConfig.factory,
+        uniswapConfig.uniswapHelper,
+        uniswapConfig.weth,
+    ]);
 
     useEffect(() => {
         fetchData();

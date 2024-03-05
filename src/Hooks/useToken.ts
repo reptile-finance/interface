@@ -30,8 +30,13 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
                 abi: erc20ABI,
                 functionName: 'decimals',
             });
-            return Promise.all([name, symbol, decimals]).then(([name, symbol, decimals]) => {
-                return { name, symbol, decimals, address };
+            const totalSupply = publicClient.readContract({
+                address,
+                abi: erc20ABI,
+                functionName: 'totalSupply',
+            });
+            return Promise.all([name, symbol, decimals, totalSupply]).then(([name, symbol, decimals, totalSupply]) => {
+                return { name, symbol, decimals, totalSupply, address };
             });
         },
         [publicClient],
@@ -52,6 +57,7 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
                         decimals: chainCfg.nativeCurrency.decimals,
                         name: chainCfg.nativeCurrency.name,
                         symbol: chainCfg.nativeCurrency.symbol,
+                        totalSupply: '0',
                         address: zeroAddress.toLowerCase() as EthAddress,
                     },
                 },
@@ -70,6 +76,7 @@ export const useToken = ({ address }: { address: EthAddress | undefined }) => {
                             decimals: data.decimals,
                             name: data.name,
                             symbol: data.symbol,
+                            totalSupply: data.totalSupply.toString(),
                             address: data.address.toLowerCase() as EthAddress,
                         },
                     },

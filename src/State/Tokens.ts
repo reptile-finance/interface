@@ -9,13 +9,14 @@ export type TTokenState = {
             decimals: number;
             name: string;
             symbol: string;
+            totalSupply: string;
             address: EthAddress;
         };
     };
 };
 
 export const TokensState = atom<TTokenState>({
-    key: 'tokens-state',
+    key: 'tokens-state-03032024',
     default: {
         [opBnbChain.id.toString()]: {},
     },

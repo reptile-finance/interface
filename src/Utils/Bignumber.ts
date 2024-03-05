@@ -19,7 +19,7 @@ export const isNumberAndNonZero = (n: string | number) => {
 
 export const areNumbers = (numbers: Array<string | number>) => numbers.every(isNumber);
 
-export const localiseNumber = (num: string | number) => BigNumber(num).toNumber().toLocaleString();
+export const localiseNumber = (num: string | number) => BigNumber(num).toNumber().toLocaleString('en-US');
 
 export const truncate = (num: string | number) => Math.trunc(BigNumber(num).toNumber()).toString(10);
 
