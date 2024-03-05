@@ -82,6 +82,19 @@ export const ReptileTokenListWrapper = styled.div`
     div {
         display: flex;
         justify-content: space-between;
+
+        > span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &:first-child {
+                img {
+                    width: 1.5rem;
+                    height: auto;
+                }
+            }
+        }
     }
 `;
 

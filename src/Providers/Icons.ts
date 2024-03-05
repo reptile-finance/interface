@@ -20,7 +20,10 @@ const TokenSymbolMapping: { [symbol: string]: Address } = {
 };
 
 export class IconsProvider {
-    public static getIconUrl(symbol: string): string {
+    public static getIconUrl(symbol?: string): string {
+        if (!symbol) {
+            return '/reptile-unknown-token.png';
+        }
         const url = TokenSymbolMapping[symbol.toUpperCase()];
         if (symbol === 'RFT') {
             return '/reptile-token.png';
@@ -31,7 +34,10 @@ export class IconsProvider {
         return '/reptile-unknown-token.png';
     }
 
-    public static getIconUrlByAddress(address: string): string {
+    public static getIconUrlByAddress(address?: string): string {
+        if (!address) {
+            return '/reptile-unknown-token.png';
+        }
         const symbol = TokenAddressMapping[address.toLowerCase()];
         if (symbol === 'RFT') {
             return '/reptile-token.png';

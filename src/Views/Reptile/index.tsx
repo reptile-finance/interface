@@ -18,6 +18,7 @@ import { TokensState } from '../../State/Tokens';
 import { useMemo } from 'react';
 import { erc20ABI, useContractReads } from 'wagmi';
 import { zeroAddress } from 'viem';
+import { IconsProvider } from '../../Providers/Icons';
 
 export const Reptile = () => {
     const { uniswapConfig } = useConfig();
@@ -105,12 +106,14 @@ const TreasuryBalances = () => {
             const dataRow = data[index];
             if (dataRow.status !== 'success') {
                 return {
+                    address: token.address,
                     symbol: token.symbol,
                     balance: '0',
                 };
             }
             return {
                 symbol: token.symbol,
+                address: token.address,
                 balance: localiseNumber(formatBalance(dataRow.result.toString(), token.decimals, 2)),
             };
         });
@@ -126,7 +129,10 @@ const TreasuryBalances = () => {
         <ReptileTokenListWrapper>
             {normalizedData.map((token) => (
                 <div>
-                    <span>{token.symbol}</span>
+                    <span>
+                        <img src={IconsProvider.getIconUrlByAddress(token.address)} alt={token.symbol} />
+                        {token.symbol}
+                    </span>
                     <span>{token.balance}</span>
                 </div>
             ))}
