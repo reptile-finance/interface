@@ -10,6 +10,7 @@ import { formatBalance } from '../../Utils/Bignumber';
 import { TokenSelector } from '../TokenSelector';
 import { EthAddress, TokenMetadata } from '../../Types';
 import { useToken } from '../../Hooks/useToken';
+import { IconsProvider } from '../../Providers/Icons';
 
 export const AddLiquidityBox: React.FC<{
     defaultToken?: EthAddress;
@@ -40,7 +41,7 @@ export const AddLiquidityBox: React.FC<{
         return () => (
             <>
                 <AddLiquidityBoxToken onClick={() => setSelectorOpen(true)}>
-                    <img src="/reptile-token.png" />
+                    <img src={IconsProvider.getIconUrlByAddress(data.address)} />
                     {data.symbol}
                 </AddLiquidityBoxToken>
                 <span>Balance: {balance}</span>

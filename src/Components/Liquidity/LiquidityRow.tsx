@@ -7,6 +7,7 @@ import { toPresentationLength } from '../../Utils/Bignumber';
 import { useToken } from '../../Hooks/useToken';
 import { RemoveLiquidity } from '../RemoveLiquidity';
 import { useToggle } from 'usehooks-ts';
+import { IconsProvider } from '../../Providers/Icons';
 
 export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAddress; pool: EthAddress } }> = ({
     pool,
@@ -25,8 +26,8 @@ export const LiquidityRow: React.FC<{ pool: { token0: EthAddress; token1: EthAdd
             <LiquidityPositionsRow>
                 <PositionNameWrapper>
                     <PositionLogosWrapper>
-                        <img src="/reptile-token.png" alt="BNB" />
-                        <img src="/reptile-token.png" alt="USDT" />
+                        <LiquidityTokenIcon address={pool.token0} />
+                        <LiquidityTokenIcon address={pool.token1} />
                     </PositionLogosWrapper>
                     <span className="name">
                         <LiquidityToken address={pool.token0} />
@@ -59,6 +60,17 @@ export const LiquidityToken: React.FC<{ address: EthAddress }> = ({ address }) =
 
     if (data) {
         return <span>{data.symbol}</span>;
+    }
+    return null;
+};
+
+export const LiquidityTokenIcon: React.FC<{ address: EthAddress }> = ({ address }) => {
+    const { data } = useToken({
+        address,
+    });
+
+    if (data) {
+        return <img src={IconsProvider.getIconUrlByAddress(data.address)} alt={data.symbol} />;
     }
     return null;
 };
